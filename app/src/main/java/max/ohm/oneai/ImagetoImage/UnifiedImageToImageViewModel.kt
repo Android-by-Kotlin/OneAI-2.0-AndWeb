@@ -181,9 +181,10 @@ class UnifiedImageToImageViewModel : ViewModel() {
 //
         // Standard Image-to-Image Models
       //  "flux-img2img" to "Flux Image-to-Image",
+        "nano-banana" to "Nano-Banana Dual Image",
         "flux-kontext-pro-img2img" to "Flux Kontext Pro",
         "flux-kontext-dev-dual" to "Flux Kontext Dev",
-        "nano-banana" to "🍌 Nano-Banana Dual Image",
+
        // "multiple-face-swap" to "🎭 Multiple Face Swap",
         "fashion-try-on" to "Fashion Try-On",
        // "stable-diffusion-img2img" to "Stable Diffusion Img2Img",
