@@ -912,6 +912,34 @@ Column(
                                                             )
                                                         }
                                                     }
+                                                    "nano-banana" -> {
+                                                        Row(
+                                                            verticalAlignment = Alignment.CenterVertically,
+                                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                        ) {
+                                                            Surface(
+                                                                shape = RoundedCornerShape(4.dp),
+                                                                color = Color(0xFFF59E0B).copy(alpha = 0.15f),
+                                                                border = BorderStroke(
+                                                                    width = 0.5.dp,
+                                                                    color = Color(0xFFF59E0B).copy(alpha = 0.3f)
+                                                                )
+                                                            ) {
+                                                                Text(
+                                                                    "MultiModel",
+                                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                                    fontSize = 9.sp,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    color = Color(0xFF07EC53)
+                                                                )
+                                                            }
+                                                            Text(
+                                                                "• Realism",
+                                                                fontSize = 10.sp,
+                                                                color = Color.White.copy(alpha = 0.6f)
+                                                            )
+                                                        }
+                                                    }
                                                     "fashion-try-on" -> {
                                                         Text(
                                                             "👗 Virtual clothing try-on",
