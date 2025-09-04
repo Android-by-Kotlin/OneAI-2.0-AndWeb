@@ -219,7 +219,11 @@ class UnifiedImageViewModel : ViewModel() {
                         val request = ModelsLabTextToImageService.TextToImageRequest(
                             prompt = safePrompt,
                             negativePrompt = modelsLabNegativePrompt,
-                            modelId = "epic-realism-rc1",
+                           // modelId = "epic-realism-rc1",
+                          //  modelId = "coffeemix-sd1-5-americano-season-1",
+                           // modelId="real-dream-classic-sd1-5-1-sd1-5",
+                            modelId= "serenity-v2-1-safetensors",
+                           // modelId= "flux",
                             scheduler = "DPMSolverSinglestepScheduler",
                             width = 768,
                             height = 1024,
@@ -295,6 +299,9 @@ class UnifiedImageViewModel : ViewModel() {
                         }
                         isLoading = false
                     }
+
+
+
                     "modelslab/nano-banana" -> {
                         if (MODELSLAB_API_KEY.isBlank() || MODELSLAB_API_KEY == "YOUR_MODELSLAB_API_KEY") {
                             errorMessage = "Please configure ModelsLab API Key"

@@ -285,6 +285,7 @@ class ModelsLabTextToImageService {
         const val MODEL_DREAMSHAPER = "dreamshaper-8"
         const val MODEL_ANYTHING_V5 = "anything-v5"
         const val MODEL_NANO_BANANA = "nano-banana"
+//const val MODEL_NANO_BANANA = "imagen-4.0-ultra"
         
         // Common schedulers
         const val SCHEDULER_DPM_SOLVER = "DPMSolverSinglestepScheduler"

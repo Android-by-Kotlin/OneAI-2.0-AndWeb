@@ -54,7 +54,7 @@ class UnifiedImageToImageViewModel : ViewModel() {
 
     var errorMessage by mutableStateOf<String?>(null)
 
-    var selectedModel by mutableStateOf("flux-kontext-pro-img2img") // Default model
+    var selectedModel by mutableStateOf("nano-banana") // Default model - Nano-Banana Dual Image
         private set
 
     // Prompt and parameters
