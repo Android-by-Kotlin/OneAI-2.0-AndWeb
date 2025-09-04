@@ -12,18 +12,26 @@ import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 /**
- * Service for ModelsLab dual image-to-image API using nano-banana model
- * Supports combining two input images based on the curl example:
+ * Service for ModelsLab image-to-image API using nano-banana model
+ * Supports both single image processing and dual image combining.
  * 
+ * For single image processing:
+ * - Use generateSingleImage() method or
+ * - Use generateDualImage() with initImage2 = null
+ * 
+ * For dual image combining (original functionality):
+ * - Use generateDualImage() with both initImage and initImage2
+ * 
+ * Based on the curl example:
  * curl -X POST "https://modelslab.com/api/v7/images/image-to-image" \
  *   -H "key: API_KEY" \
  *   -H "Content-Type: application/json" \
  *   -d '{
  *     "key": "<API_KEY>",
- *     "prompt": "girl from image one wearing dress from image two",
+ *     "prompt": "transform this image",
  *     "model_id": "nano-banana",
  *     "init_image": "https://...",
- *     "init_image_2": "https://..."
+ *     "init_image_2": "https://..." // Optional for dual image mode
  *   }'
  */
 class ModelsLabDualImageService {
@@ -37,7 +45,7 @@ class ModelsLabDualImageService {
     data class DualImageToImageRequest(
         val prompt: String,
         val initImage: String, // First input image (URL or base64)
-        val initImage2: String, // Second input image (URL or base64)
+        val initImage2: String? = null, // Second input image (URL or base64) - optional
         val modelId: String = "nano-banana",
         val negativePrompt: String = "",
         val numInferenceSteps: Int = 31,
@@ -76,7 +84,10 @@ class ModelsLabDualImageService {
                 put("negative_prompt", request.negativePrompt)
                 put("model_id", request.modelId)
                 put("init_image", request.initImage)
-                put("init_image_2", request.initImage2)
+                // Only include second image if provided
+                request.initImage2?.let { secondImage ->
+                    put("init_image_2", secondImage)
+                }
                 put("num_inference_steps", request.numInferenceSteps.toString())
                 put("strength", request.strength.toString())
                 put("scheduler", request.scheduler)
@@ -279,6 +290,36 @@ class ModelsLabDualImageService {
             status = "error",
             error = "Timeout: Dual image generation took too long"
         )
+    }
+    
+    /**
+     * Convenience method for single image-to-image generation
+     * Uses only one input image with the nano-banana model
+     */
+    suspend fun generateSingleImage(
+        prompt: String,
+        initImage: String,
+        negativePrompt: String = "",
+        strength: Double = 0.8,
+        guidanceScale: Double = 7.5,
+        width: Int = 768,
+        height: Int = 1024,
+        enhancePrompt: Boolean = false
+    ): DualImageToImageResponse {
+        val request = DualImageToImageRequest(
+            prompt = prompt,
+            initImage = initImage,
+            initImage2 = null, // No second image for single image processing
+            negativePrompt = negativePrompt,
+            strength = strength,
+            guidanceScale = guidanceScale,
+            width = width,
+            height = height,
+            enhancePrompt = enhancePrompt
+        )
+        
+        Log.d("ModelsLabDualImage", "Processing single image with nano-banana model")
+        return generateDualImage(request)
     }
     
     companion object {

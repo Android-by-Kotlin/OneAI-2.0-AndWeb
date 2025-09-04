@@ -2031,8 +2031,11 @@ viewModel.generatedImageBitmap?.let { bitmap ->
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(
                                     width = 1.dp,
-                                    color = if (viewModel.secondImage != null) 
-                                        Color(0xFF10B981) else Color(0xFFEF4444)
+                                    color = when {
+                                        viewModel.secondImage != null -> Color(0xFF10B981)
+                                        viewModel.selectedModel == "nano-banana" -> Color(0xFF6366F1) // Optional - neutral color
+                                        else -> Color(0xFFEF4444) // Required for flux-kontext-dev-dual
+                                    }
                                 )
                             ) {
                                 Column(
@@ -2046,7 +2049,10 @@ viewModel.generatedImageBitmap?.let { bitmap ->
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            "Second Image (Required)",
+                                            if (viewModel.selectedModel == "nano-banana") 
+                                                "Second Image (Optional)" 
+                                            else 
+                                                "Second Image (Required)",
                                             color = Color.White,
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Medium
