@@ -1363,7 +1363,7 @@ private fun ModelSelectionCard(
                                         else -> "Standard • Balanced"
                                     },
                                 color = when {
-                                    currentModel.displayName.contains("Ultra") || currentModel.displayName.contains("Pro") || currentModel.displayName.contains("ImageGen-4 Premium") -> 
+                                    currentModel.displayName.contains("Ultra") || currentModel.displayName.contains("Pro") || currentModel.displayName.contains("ImageGen-4") ->
                                         GradientPink.copy(alpha = 0.9f)
                                     else -> TextSecondary.copy(alpha = 0.7f)
                                 },
@@ -1563,7 +1563,9 @@ private fun ModelSelectionCard(
                                             model.displayName.contains("Pro") -> "Pro" to GradientPurple
                                             model.displayName.contains("Max") -> "Max" to GradientCyan
                                             model.displayName.contains("DALL") -> "Creative" to Color(0xFF06B6D4)
-                                            model.displayName.contains("ImageGen-4 Premium") -> "Premium" to Color(0xFFF59E0B)
+                                            model.displayName.contains("ImageGen-4") -> "Realistic" to Color(
+                                                0xFFF50B4D
+                                            )
                                             model.displayName.contains("Shuttle") -> "Artistic" to Color(0xFFEC4899)
                                             model.displayName.contains("Dev") -> "Fast" to GradientGreen
                                             else -> "Realism" to GradientGreen
