@@ -148,10 +148,11 @@ fun EnhancedImageGeneratorScreen(
     // Model selection
     var modelMenuExpanded by remember { mutableStateOf(false) }
     val modelChoices = listOf(
-        ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"),
+        ModelChoice("DALL-E 3", "provider-3/dall-e-3"),
+       // ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"),
        // ModelChoice("Flux Schnell", "flux.1-schnell"),
       //   ModelChoice("Image-1", "provider-6/gpt-image-1"),
-        ModelChoice("ImageGen-4", "google/imagen-4"),
+        ModelChoice("ImageGen-4 Premium", "google/imagen-4"),
         ModelChoice("ImageGen-3", "google/imagen-3"),
         ModelChoice("Qwen", "provider-4/qwen-image"),
 //        ModelChoice("ImageGen-4", "provider-4/imagen-4"),
@@ -163,7 +164,6 @@ fun EnhancedImageGeneratorScreen(
         //ModelChoice("Flux Pro Raw", "provider-3/FLUX.1.1-pro-ultra-raw"),
       //  ModelChoice("Flux Pro", "provider-1/FLUX.1.1-pro"),
        // ModelChoice("Flux Ultra Pro", "provider-3/FLUX.1.1-pro-ultra"),
-        ModelChoice("DALL-E 3", "provider-3/dall-e-3"),
         ModelChoice("Shuttle 3.1 Aesthetic", "provider-3/shuttle-3.1-aesthetic"),
         ModelChoice("Shuttle 3 Diffusion", "provider-3/shuttle-3-diffusion")
         // ModelChoice("Shuttle Jaguar", "provider-3/shuttle-jaguar")
@@ -187,14 +187,14 @@ fun EnhancedImageGeneratorScreen(
     
     // Initialize model and music manager
     LaunchedEffect(Unit) {
-        // Set default model to Flux Dev - this ensures Flux Dev is always the default
-        val defaultFluxDevModel = "provider-3/FLUX.1-dev"
-        unifiedImageViewModel.updateSelectedModel(defaultFluxDevModel)
+        // Set default model to DALL-E 3 - this ensures DALL-E 3 is always the default
+        val defaultDallE3Model = "provider-3/dall-e-3"
+        unifiedImageViewModel.updateSelectedModel(defaultDallE3Model)
         
-        // Double-check after a short delay to ensure the model is properly set to Flux Dev
+        // Double-check after a short delay to ensure the model is properly set to DALL-E 3
         kotlinx.coroutines.delay(100)
-        if (unifiedImageViewModel.selectedModel.isEmpty() || unifiedImageViewModel.selectedModel != defaultFluxDevModel) {
-            unifiedImageViewModel.updateSelectedModel(defaultFluxDevModel)
+        if (unifiedImageViewModel.selectedModel.isEmpty() || unifiedImageViewModel.selectedModel != defaultDallE3Model) {
+            unifiedImageViewModel.updateSelectedModel(defaultDallE3Model)
         }
         
         BackgroundMusicManager.initialize(context)
@@ -1353,16 +1353,17 @@ private fun ModelSelectionCard(
                                 fontWeight = FontWeight.SemiBold
                             )
                             // Model Type Badge
-                            Text(
-                                text = when {
-                                    currentModel.displayName.contains("Ultra") -> "Premium • Ultra Quality"
-                                    currentModel.displayName.contains("Pro") -> "Professional • High Quality"
-                                    currentModel.displayName.contains("Max") -> "Maximum • Best Performance"
-                                    currentModel.displayName.contains("Dev") -> "Development • Fast Generation"
-                                    else -> "Standard • Balanced"
-                                },
+                                Text(
+                                    text = when {
+                                        currentModel.displayName.contains("Ultra") -> "Premium • Ultra Quality"
+                                        currentModel.displayName.contains("Pro") -> "Professional • High Quality"
+                                        currentModel.displayName.contains("Max") -> "Maximum • Best Performance"
+                                        currentModel.displayName.contains("Dev") -> "Development • Fast Generation"
+                                        currentModel.displayName.contains("ImageGen-4 Premium") -> "Premium • Next-Gen Quality"
+                                        else -> "Standard • Balanced"
+                                    },
                                 color = when {
-                                    currentModel.displayName.contains("Ultra") || currentModel.displayName.contains("Pro") -> 
+                                    currentModel.displayName.contains("Ultra") || currentModel.displayName.contains("Pro") || currentModel.displayName.contains("ImageGen-4 Premium") -> 
                                         GradientPink.copy(alpha = 0.9f)
                                     else -> TextSecondary.copy(alpha = 0.7f)
                                 },
@@ -1562,6 +1563,7 @@ private fun ModelSelectionCard(
                                             model.displayName.contains("Pro") -> "Pro" to GradientPurple
                                             model.displayName.contains("Max") -> "Max" to GradientCyan
                                             model.displayName.contains("DALL") -> "Creative" to Color(0xFF06B6D4)
+                                            model.displayName.contains("ImageGen-4 Premium") -> "Premium" to Color(0xFFF59E0B)
                                             model.displayName.contains("Shuttle") -> "Artistic" to Color(0xFFEC4899)
                                             model.displayName.contains("Dev") -> "Fast" to GradientGreen
                                             else -> "Realism" to GradientGreen
@@ -1581,7 +1583,7 @@ private fun ModelSelectionCard(
                                         }
                                         
                                         // Performance indicator
-                                        if (model.displayName.contains("Ultra") || model.displayName.contains("Pro")) {
+                                        if (model.displayName.contains("Ultra") || model.displayName.contains("Pro") || model.displayName.contains("ImageGen-4 Premium")) {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 horizontalArrangement = Arrangement.spacedBy(2.dp)

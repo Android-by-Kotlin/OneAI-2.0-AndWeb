@@ -237,7 +237,8 @@ fun ImageGeneratorScreen(
 
     var modelMenuExpanded by remember { mutableStateOf(false) }
     val modelChoices = listOf(
-        ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"), // DEFAULT MODEL - First in list
+        ModelChoice("DALL-E 3", "provider-3/dall-e-3"), // DEFAULT MODEL - First in list
+        ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"),
         ModelChoice("ModelsLab Epic Realism", "modelslab/epic-realism"),
         ModelChoice("ImageGen-4", "provider-4/imagen-4"),
         ModelChoice("Flux Schnell", "flux.1-schnell"),
@@ -248,19 +249,18 @@ fun ImageGeneratorScreen(
         ModelChoice("Flux Pro Raw", "provider-3/FLUX.1.1-pro-ultra-raw"),
         ModelChoice("Flux Pro", "provider-1/FLUX.1.1-pro"),
         ModelChoice("Flux Ultra Pro", "provider-3/FLUX.1.1-pro-ultra"),
-        ModelChoice("DALL-E 3", "provider-3/dall-e-3"),
         ModelChoice("Shuttle 3.1 Aesthetic", "provider-3/shuttle-3.1-aesthetic"),
         ModelChoice("Shuttle 3 Diffusion", "provider-3/shuttle-3-diffusion")
     )
-    // Always ensure we have a valid model choice, defaulting to Flux Dev if not found
+    // Always ensure we have a valid model choice, defaulting to DALL-E 3 if not found
     val currentSelectedModelChoice = modelChoices.find { it.internalName == selectedModelInternalName } 
-        ?: modelChoices.find { it.internalName == "provider-3/FLUX.1-dev" } 
+        ?: modelChoices.find { it.internalName == "provider-3/dall-e-3" } 
         ?: modelChoices.first()
 
     // Ensure the model is properly initialized when the screen is first displayed
     LaunchedEffect(Unit) {
         // Force initialize with the default model to ensure proper setup
-        val defaultModel = "provider-3/FLUX.1-dev"
+        val defaultModel = "provider-3/dall-e-3"
         Log.d("ImageGeneratorScreen", "Initializing with default model: $defaultModel, current model: ${unifiedImageViewModel.selectedModel}")
         
         // Always force the model to be set to the default on screen initialization
@@ -612,7 +612,7 @@ fun ImageGeneratorScreen(
                 onClick = { 
                     if (unifiedImageViewModel.selectedModel.isBlank()) {
                         Log.d("ImageGeneratorScreen", "Setting model before generating")
-                        unifiedImageViewModel.updateSelectedModel("provider-3/FLUX.1-dev")
+                        unifiedImageViewModel.updateSelectedModel("provider-3/dall-e-3")
                     }
                     unifiedImageViewModel.generateImage() 
                 },
