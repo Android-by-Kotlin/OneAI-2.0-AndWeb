@@ -187,14 +187,14 @@ fun EnhancedImageGeneratorScreen(
     
     // Initialize model and music manager
     LaunchedEffect(Unit) {
-        // Set default model to DALL-E 3 - this ensures DALL-E 3 is always the default
-        val defaultDallE3Model = "provider-3/dall-e-3"
-        unifiedImageViewModel.updateSelectedModel(defaultDallE3Model)
+        // Set default model to ImageGen-4 Premium - this ensures ImageGen-4 Premium is always the default
+        val defaultImageGenModel = "google/imagen-4"
+        unifiedImageViewModel.updateSelectedModel(defaultImageGenModel)
         
-        // Double-check after a short delay to ensure the model is properly set to DALL-E 3
+        // Double-check after a short delay to ensure the model is properly set to ImageGen-4 Premium
         kotlinx.coroutines.delay(100)
-        if (unifiedImageViewModel.selectedModel.isEmpty() || unifiedImageViewModel.selectedModel != defaultDallE3Model) {
-            unifiedImageViewModel.updateSelectedModel(defaultDallE3Model)
+        if (unifiedImageViewModel.selectedModel.isEmpty() || unifiedImageViewModel.selectedModel != defaultImageGenModel) {
+            unifiedImageViewModel.updateSelectedModel(defaultImageGenModel)
         }
         
         BackgroundMusicManager.initialize(context)
