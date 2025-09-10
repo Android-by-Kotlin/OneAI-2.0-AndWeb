@@ -85,7 +85,7 @@ class UnifiedImageViewModel : ViewModel() {
 
 
 
-    var selectedModel by mutableStateOf("google/imagen-4") // Default model - ImageGen-4 Premium
+    var selectedModel by mutableStateOf("provider-3/dall-e-3") // Default model - DALL-E 3
 
 
 
@@ -110,7 +110,7 @@ class UnifiedImageViewModel : ViewModel() {
     // Initialize the ViewModel with default model
     init {
         // Ensure the default model is properly set
-        selectedModel = "google/imagen-4"
+        selectedModel = "provider-3/dall-e-3"
     }
 
     fun updatePrompt(newPrompt: TextFieldValue) {
@@ -177,7 +177,7 @@ class UnifiedImageViewModel : ViewModel() {
         // Ensure we have a valid model selected
         if (selectedModel.isBlank()) {
             // Set to default model if somehow blank
-            selectedModel = "google/imagen-4"
+            selectedModel = "provider-3/dall-e-3"
             Log.d("ImageGeneration", "Model was blank, set to default: $selectedModel")
         }
         
@@ -941,11 +941,11 @@ class UnifiedImageViewModel : ViewModel() {
                         Log.e("ImageGeneration", "Invalid model selected: '$selectedModel'")
                         
                         // Try to use the default model as a fallback
-                        if (selectedModel != "google/imagen-4") {
-                            Log.d("ImageGeneration", "Falling back to google/imagen-4 model")
-                            selectedModel = "google/imagen-4"
+                        if (selectedModel != "provider-3/dall-e-3") {
+                            Log.d("ImageGeneration", "Falling back to provider-3/dall-e-3 model")
+                            selectedModel = "provider-3/dall-e-3"
                             
-                            // Retry with the default model (ImageGen-4 Premium)
+                            // Retry with the default model (DALL-E 3)
                             if (A4F_API_KEY == "YOUR_A4F_API_KEY_HERE" || A4F_API_KEY.isBlank()) {
                                 errorMessage = "Please set your A4F API Key in A4FClient"
                                 isLoading = false
@@ -953,10 +953,10 @@ class UnifiedImageViewModel : ViewModel() {
                             }
                             
                             val request = FluxImageGenerationRequest(
-                                model = "provider-4/imagen-4",
-                                prompt = "$safePrompt",
+                                model = "provider-3/dall-e-3",
+                                prompt = "$safePrompt, safe for work, family-friendly",
                                 n = 1,
-                                size = "1024x1792"
+                                size = "1024x1024"
                             )
                             val response = FluxApiClient.apiService.generateImage(request)
 
@@ -965,8 +965,8 @@ class UnifiedImageViewModel : ViewModel() {
                                 imageUrl = generatedFluxImage?.url
                             } else {
                                 val errorBody = response.errorBody()?.string() ?: "Unknown API error"
-                                val technicalError = "ImageGen-4 API Error: ${response.code()} - ${errorBody}"
-                                errorMessage = getUserFriendlyErrorMessage(technicalError, "ImageGen-4")
+                                val technicalError = "DALL-E 3 API Error: ${response.code()} - ${errorBody}"
+                                errorMessage = getUserFriendlyErrorMessage(technicalError, "DALL-E 3")
                             }
                             isLoading = false
                         } else {

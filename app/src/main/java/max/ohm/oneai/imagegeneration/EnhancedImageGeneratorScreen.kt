@@ -148,24 +148,24 @@ fun EnhancedImageGeneratorScreen(
     // Model selection
     var modelMenuExpanded by remember { mutableStateOf(false) }
     val modelChoices = listOf(
-        ModelChoice("DALL-E 3", "provider-3/dall-e-3"),
-       // ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"),
-       // ModelChoice("Flux Schnell", "flux.1-schnell"),
-      //   ModelChoice("Image-1", "provider-6/gpt-image-1"),
-        ModelChoice("ImageGen-4 Premium", "google/imagen-4"),
-        ModelChoice("ImageGen-3", "google/imagen-3"),
-        ModelChoice("Qwen", "provider-4/qwen-image"),
+        ModelChoice("DALL-E 3", "provider-3/dall-e-3"), // Default first choice
+        ModelChoice("Flux Dev", "provider-3/FLUX.1-dev"),
+        ModelChoice("Flux Schnell", "flux.1-schnell"),
+//         ModelChoice("Image-1", "provider-6/gpt-image-1"),
+//        ModelChoice("ImageGen-4 Premium", "google/imagen-4"),
+//        ModelChoice("ImageGen-3", "google/imagen-3"),
+//        ModelChoice("Qwen", "provider-4/qwen-image"),
 //        ModelChoice("ImageGen-4", "provider-4/imagen-4"),
 //        ModelChoice("ImageGen-3", "provider-4/imagen-3"),
-      //  ModelChoice("DSLR Photograph", "modelslab/epic-realism"),
-        ModelChoice("Nano Banana", "modelslab/nano-banana"),
-      //  ModelChoice("FLUX Kontext Max", "provider-2/FLUX.1-kontext-max"),
-       // ModelChoice("FLUX Kontext Pro", "provider-1/FLUX.1-kontext-pro"),
-        //ModelChoice("Flux Pro Raw", "provider-3/FLUX.1.1-pro-ultra-raw"),
-      //  ModelChoice("Flux Pro", "provider-1/FLUX.1.1-pro"),
-       // ModelChoice("Flux Ultra Pro", "provider-3/FLUX.1.1-pro-ultra"),
+//       ModelChoice("DSLR Photograph", "modelslab/epic-realism"),
+        ModelChoice("\uD83C\uDF4C Nano Banana", "modelslab/nano-banana"),
+//        ModelChoice("FLUX Kontext Max", "provider-2/FLUX.1-kontext-max"),
+//        ModelChoice("FLUX Kontext Pro", "provider-1/FLUX.1-kontext-pro"),
+//        ModelChoice("Flux Pro Raw", "provider-3/FLUX.1.1-pro-ultra-raw"),
+//        ModelChoice("Flux Pro", "provider-1/FLUX.1.1-pro"),
+//        ModelChoice("Flux Ultra Pro", "provider-3/FLUX.1.1-pro-ultra"),
         ModelChoice("Shuttle 3.1 Aesthetic", "provider-3/shuttle-3.1-aesthetic"),
-        ModelChoice("Shuttle 3 Diffusion", "provider-3/shuttle-3-diffusion")
+        ModelChoice("Shuttle 3 Diffusion", "provider-3/shuttle-3-diffusion"),
         // ModelChoice("Shuttle Jaguar", "provider-3/shuttle-jaguar")
     )
     
@@ -187,11 +187,11 @@ fun EnhancedImageGeneratorScreen(
     
     // Initialize model and music manager
     LaunchedEffect(Unit) {
-        // Set default model to ImageGen-4 Premium - this ensures ImageGen-4 Premium is always the default
-        val defaultImageGenModel = "google/imagen-4"
+        // Set default model to DALL-E 3 - this ensures DALL-E 3 is always the default
+        val defaultImageGenModel = "provider-3/dall-e-3"
         unifiedImageViewModel.updateSelectedModel(defaultImageGenModel)
         
-        // Double-check after a short delay to ensure the model is properly set to ImageGen-4 Premium
+        // Double-check after a short delay to ensure the model is properly set to DALL-E 3
         kotlinx.coroutines.delay(100)
         if (unifiedImageViewModel.selectedModel.isEmpty() || unifiedImageViewModel.selectedModel != defaultImageGenModel) {
             unifiedImageViewModel.updateSelectedModel(defaultImageGenModel)
@@ -723,10 +723,10 @@ fun EnhancedImageGeneratorScreen(
                 // Generate Button with Dark Background
                 Button(
                     onClick = { 
-                        // Ensure we have a valid model selected, fallback to Flux Dev if needed
+                        // Ensure we have a valid model selected, fallback to DALL-E 3 if needed
                         val currentModel = unifiedImageViewModel.selectedModel
                         if (currentModel.isBlank()) {
-                            unifiedImageViewModel.updateSelectedModel("provider-3/FLUX.1-dev")
+                            unifiedImageViewModel.updateSelectedModel("provider-3/dall-e-3")
                         }
                         unifiedImageViewModel.generateImage()
                     },

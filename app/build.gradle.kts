@@ -15,8 +15,8 @@ android {
         applicationId = "max.ohm.oneai"
         minSdk = 28
         targetSdk = 35
-        versionCode = 18
-        versionName = "1.18"
+        versionCode = 21
+        versionName = "1.21"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
