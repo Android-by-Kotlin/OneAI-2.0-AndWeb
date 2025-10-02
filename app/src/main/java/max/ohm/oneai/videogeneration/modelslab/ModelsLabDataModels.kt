@@ -27,23 +27,35 @@ data class ModelsLabVideoRequest(
 data class ModelsLabVideoResponse(
     val status: String,
     val message: String?,
-    @SerializedName("output") val outputUrls: List<String>?,
+    @SerializedName("output") val output: List<String>?,  // Changed from outputUrls to output
+    val outputUrls: List<String>? = null,  // Keep for backward compatibility
     val eta: Double?,
     @SerializedName("fetch_result") val fetchResultUrl: String?,
     val id: Long?,
     @SerializedName("generationTime") val generationTime: Double?,
     val error: String?
-)
+) {
+    // Helper to get the actual video URLs regardless of which field is populated
+    fun getVideoUrls(): List<String>? {
+        return output ?: outputUrls
+    }
+}
 
 // Model for async generation status check
 data class ModelsLabStatusResponse(
     val status: String,
     val message: String?,
-    @SerializedName("output") val outputUrls: List<String>?,
+    @SerializedName("output") val output: List<String>?,  // Changed from outputUrls to output
+    val outputUrls: List<String>? = null,  // Keep for backward compatibility
     val eta: Double?,
     @SerializedName("generationTime") val generationTime: Double?,
     val error: String?
-)
+) {
+    // Helper to get the actual video URLs regardless of which field is populated
+    fun getVideoUrls(): List<String>? {
+        return output ?: outputUrls
+    }
+}
 
 // Request model for ModelsLab image-to-video API (Seedance I2V)
 data class ModelsLabImageToVideoRequest(

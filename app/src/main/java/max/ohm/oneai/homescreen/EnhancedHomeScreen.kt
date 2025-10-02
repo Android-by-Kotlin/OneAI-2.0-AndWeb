@@ -234,6 +234,14 @@ listOf(
                     )
                 )
             ),
+            BannerItem(
+                title = "Image to Video",
+                subtitle = "Transform images into dynamic videos",
+                icon = Icons.Outlined.VideoLibrary,
+                imageUrl = "https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_1280.jpg",
+                gradientColors = listOf(Color(0xFF667EEA), Color(0xFF764BA2)),
+                route = "imageToVideo"
+            ),
             // BannerItem(
             //     title = "Video Generation (Coming Soon)",
             //     subtitle = "Create stunning videos from text prompts - Feature in development",

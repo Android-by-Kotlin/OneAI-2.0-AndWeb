@@ -46,6 +46,8 @@ import max.ohm.oneai.stabilityai.ui.SketchToImageScreen
 import max.ohm.oneai.stabilityai.viewmodel.SketchToImageViewModel
 import max.ohm.oneai.navigation.MainScaffold
 import max.ohm.oneai.debug.AuthDebugScreen
+import max.ohm.oneai.imagetovideo.ImageToVideoScreen
+import max.ohm.oneai.imagetovideo.ImageToVideoViewModel
 
 // --- Navigation ---
 @Composable
@@ -409,6 +411,20 @@ fun AppNavigation() {
         
         composable("authDebug") { // Add debug screen for authentication testing
             AuthDebugScreen(navController = navController, loginViewModel = loginViewModel)
+        }
+        
+        composable("imageToVideo") { // Add Image-to-Video generation destination
+            // Check if user is logged in
+            LaunchedEffect(loginState) {
+                if (loginState !is LoginState.Success) {
+                    navController.navigate("login") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            }
+            ImageToVideoScreen(
+                navController = navController
+            )
         }
 
         // Add other destinations here (translator)
