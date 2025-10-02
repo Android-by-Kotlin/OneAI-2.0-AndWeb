@@ -85,8 +85,7 @@ class UnifiedImageViewModel : ViewModel() {
 
 
 
-    var selectedModel by mutableStateOf("provider-3/dall-e-3") // Default model - DALL-E 3
-
+    var selectedModel by mutableStateOf("modelslab/nano-banana") // Default model - Nano Banana
 
 
 
@@ -110,7 +109,7 @@ class UnifiedImageViewModel : ViewModel() {
     // Initialize the ViewModel with default model
     init {
         // Ensure the default model is properly set
-        selectedModel = "provider-3/dall-e-3"
+        selectedModel = "modelslab/nano-banana"
     }
 
     fun updatePrompt(newPrompt: TextFieldValue) {
@@ -177,7 +176,7 @@ class UnifiedImageViewModel : ViewModel() {
         // Ensure we have a valid model selected
         if (selectedModel.isBlank()) {
             // Set to default model if somehow blank
-            selectedModel = "provider-3/dall-e-3"
+            selectedModel = "modelslab/nano-banana"
             Log.d("ImageGeneration", "Model was blank, set to default: $selectedModel")
         }
         
