@@ -89,6 +89,12 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'Qwen3 32B',
     provider: 'a4f',
     description: 'Large Qwen3 32B model via A4F'
+  },
+  {
+    id: 'provider-5/qwq-32b',
+    name: 'QwQ 32B',
+    provider: 'a4f',
+    description: 'QwQ 32B reasoning model via A4F'
   }
 ];
 
