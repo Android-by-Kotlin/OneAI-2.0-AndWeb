@@ -71,6 +71,12 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'O1 Mini',
     provider: 'a4f',
     description: 'Reasoning-focused O1 mini via A4F'
+  },
+  {
+    id: 'provider-6/llama-3.2-1b-instruct',
+    name: 'Llama 3.2 1B',
+    provider: 'a4f',
+    description: 'Fast and lightweight Llama 3.2 1B via A4F'
   }
 ];
 
