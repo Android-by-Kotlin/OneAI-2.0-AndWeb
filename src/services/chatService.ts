@@ -95,6 +95,12 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'QwQ 32B',
     provider: 'a4f',
     description: 'QwQ 32B reasoning model via A4F'
+  },
+  {
+    id: 'provider-5/gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    provider: 'a4f',
+    description: 'Latest Gemini 2.5 Flash model via A4F'
   }
 ];
 
