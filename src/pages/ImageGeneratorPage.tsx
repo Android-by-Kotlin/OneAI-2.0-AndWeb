@@ -64,33 +64,34 @@ const ImageGeneratorPage = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button 
-            onClick={() => navigate('/home')}
-            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back
-          </button>
-          <h1 className="text-3xl font-bold gradient-text">Text to Image</h1>
-          <div className="w-20"></div>
-        </div>
+    <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 flex-shrink-0">
+        <button 
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back
+        </button>
+        <h1 className="text-2xl font-bold gradient-text">Text to Image</h1>
+        <div className="w-20"></div>
+      </div>
 
-        <div className="space-y-6">
-          {/* Image Display */}
+      {/* Main Content - Grid Layout */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 pt-0 overflow-hidden">
+        {/* Left Side - Image Display */}
+        <div className="flex flex-col gap-3 min-h-0">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass rounded-2xl p-2 aspect-[3/4] relative overflow-hidden"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="glass rounded-2xl p-2 flex-1 relative overflow-hidden"
           >
             {isLoading ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="relative">
-                  <div className="w-24 h-24 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-                  <Sparkles className="w-12 h-12 text-purple-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  <div className="w-20 h-20 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                  <Sparkles className="w-10 h-10 text-purple-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                 </div>
                 <p className="text-gray-300 mt-6 text-lg">Creating your masterpiece...</p>
                 <p className="text-gray-400 mt-2">{formatTime(elapsedTime)}</p>
@@ -119,36 +120,12 @@ const ImageGeneratorPage = () => {
               </div>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <ImageIcon className="w-20 h-20 text-gray-600 mb-4" />
+                <ImageIcon className="w-16 h-16 text-gray-600 mb-4" />
                 <p className="text-gray-400 text-lg">Ready to create</p>
-                <p className="text-gray-500 text-sm mt-2">Enter a prompt below to generate an image</p>
+                <p className="text-gray-500 text-sm mt-2">Enter a prompt to generate</p>
               </div>
             )}
           </motion.div>
-
-          {/* Error Display */}
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="glass-error rounded-xl p-4 flex items-start gap-3"
-              >
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-red-400 font-medium">Error</p>
-                  <p className="text-red-300 text-sm mt-1">{error}</p>
-                </div>
-                <button
-                  onClick={() => setError(null)}
-                  className="text-red-400 hover:text-red-300"
-                >
-                  ×
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Generation Time */}
           {generationTime && !isLoading && (
@@ -161,28 +138,55 @@ const ImageGeneratorPage = () => {
               <span>Generated in {generationTime.toFixed(1)}s</span>
             </motion.div>
           )}
+        </div>
+
+        {/* Right Side - Controls */}
+        <div className="flex flex-col gap-3 min-h-0">
+          {/* Error Display */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="glass-error rounded-xl p-3 flex items-start gap-3 flex-shrink-0"
+              >
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-red-400 font-medium text-sm">Error</p>
+                  <p className="text-red-300 text-xs mt-1">{error}</p>
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-red-400 hover:text-red-300 text-xl leading-none"
+                >
+                  ×
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Model Selection */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass rounded-xl p-6"
+            className="glass rounded-xl p-4 flex-shrink-0"
           >
-            <label className="text-gray-300 text-sm font-medium mb-3 block">AI Model</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className="text-gray-300 text-sm font-medium mb-2 block">AI Model</label>
+            <div className="grid grid-cols-2 gap-2">
               {IMAGE_MODELS.map((model) => (
                 <button
                   key={model.id}
                   onClick={() => setSelectedModel(model.id)}
                   disabled={isLoading}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
                     selectedModel === model.id
                       ? 'border-purple-500 bg-purple-500/10'
                       : 'border-gray-700 hover:border-gray-600'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <div className="font-medium text-white mb-1">{model.name}</div>
+                  <div className="font-medium text-white text-sm mb-1">{model.name}</div>
                   <div className="text-xs text-gray-400">{model.description}</div>
                 </button>
               ))}
@@ -191,29 +195,29 @@ const ImageGeneratorPage = () => {
 
           {/* Prompt Input */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass rounded-xl p-6"
+            className="glass rounded-xl p-4 flex-1 min-h-0 flex flex-col"
           >
-            <label className="text-gray-300 text-sm font-medium mb-3 block">Creative Prompt</label>
+            <label className="text-gray-300 text-sm font-medium mb-2 block flex-shrink-0">Creative Prompt</label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               disabled={isLoading}
               placeholder="Describe your artistic vision (family-friendly content only)..."
-              className="w-full bg-gray-800/50 text-white rounded-lg px-4 py-3 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none disabled:opacity-50"
+              className="w-full flex-1 bg-gray-800/50 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none disabled:opacity-50"
             />
           </motion.div>
 
           {/* Generate Button */}
           <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
-            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex-shrink-0"
           >
             {isLoading ? (
               <>
@@ -229,7 +233,7 @@ const ImageGeneratorPage = () => {
           </motion.button>
 
           {/* Warning */}
-          <p className="text-center text-gray-500 text-xs">
+          <p className="text-center text-gray-500 text-xs flex-shrink-0">
             ⚠️ Some models may not work due to heavy traffic
           </p>
         </div>
