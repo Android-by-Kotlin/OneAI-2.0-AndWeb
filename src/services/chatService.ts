@@ -57,8 +57,7 @@ export const AVAILABLE_MODELS: ChatModel[] = [
 ];
 
 // Initialize Gemini AI with API key from config
-const GEMINI_API_KEY = API_CONFIG.GEMINI_API_KEY || 'AIzaSyCrWF3Wq9tN1-0IsWRoVC0MVhE0kS0YXeY';
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(API_CONFIG.GEMINI_API_KEY);
 
 /**
  * Clean response text by removing thinking tags
