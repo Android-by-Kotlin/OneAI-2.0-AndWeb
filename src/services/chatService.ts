@@ -83,6 +83,12 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'DeepSeek R1 Qwen3 8B',
     provider: 'a4f',
     description: 'Advanced reasoning model DeepSeek R1 via A4F'
+  },
+  {
+    id: 'provider-1/qwen3-32b',
+    name: 'Qwen3 32B',
+    provider: 'a4f',
+    description: 'Large Qwen3 32B model via A4F'
   }
 ];
 
