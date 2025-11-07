@@ -77,6 +77,12 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'Llama 3.2 1B',
     provider: 'a4f',
     description: 'Fast and lightweight Llama 3.2 1B via A4F'
+  },
+  {
+    id: 'provider-5/deepseek-r1-0528-qwen3-8b',
+    name: 'DeepSeek R1 Qwen3 8B',
+    provider: 'a4f',
+    description: 'Advanced reasoning model DeepSeek R1 via A4F'
   }
 ];
 
