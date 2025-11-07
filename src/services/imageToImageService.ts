@@ -204,6 +204,92 @@ export async function transformImageDual(
   }
 }
 
+// Inpainting with mask
+export async function inpaintImage(
+  imageFile: File,
+  maskCanvas: HTMLCanvasElement,
+  prompt: string,
+  guidanceScale: number = 7.5,
+  strength: number = 0.7
+): Promise<{ imageUrl: string; generationTime?: number }> {
+  try {
+    // Convert original image to base64
+    const base64Image = await imageToBase64(imageFile);
+    const formattedImage = `data:image/jpeg;base64,${base64Image}`;
+
+    // Convert mask canvas to base64 PNG
+    const maskBase64 = maskCanvas.toDataURL('image/png').split(',')[1];
+    const formattedMask = `data:image/png;base64,${maskBase64}`;
+
+    const requestBody = {
+      key: API_CONFIG.MODELSLAB_API_KEY,
+      model_id: 'v51_inpainting',
+      prompt: prompt,
+      negative_prompt: 'ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face, blurry, draft, grainy',
+      init_image: formattedImage,
+      mask_image: formattedMask,
+      samples: 1,
+      steps: 21,
+      safety_checker: 'no',
+      guidance_scale: guidanceScale,
+      strength: strength,
+      scheduler: 'DPMSolverMultistepScheduler',
+      tomesd: 'yes',
+      use_karras_sigmas: 'yes',
+      base64: true,
+      webhook: null,
+      track_id: null
+    };
+
+    const response = await axios.post<ModelsLabResponse>(
+      'https://modelslab.com/api/v6/images/inpaint',
+      requestBody,
+      {
+        headers: {
+          'key': API_CONFIG.MODELSLAB_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        timeout: 120000
+      }
+    );
+
+    if (response.data.status === 'success') {
+      if (response.data.output && response.data.output.length > 0) {
+        return {
+          imageUrl: response.data.output[0],
+          generationTime: response.data.generationTime
+        };
+      } else {
+        throw new Error('No image was generated');
+      }
+    } else if (response.data.status === 'processing') {
+      if (response.data.id) {
+        return await pollForImageResults(response.data.id);
+      }
+      throw new Error('Image is processing but no request ID was provided');
+    } else {
+      throw new Error(response.data.error || response.data.message || 'Failed to inpaint image');
+    }
+  } catch (error: any) {
+    console.error('Inpainting error:', error);
+    
+    if (error.response?.status === 500 || error.response?.status === 503) {
+      throw new Error('Model is experiencing heavy traffic. Please try again later.');
+    }
+    if (error.response?.status === 429) {
+      throw new Error('Too many requests. Please wait a moment before trying again.');
+    }
+    if (error.response?.status === 401) {
+      throw new Error('Invalid API key. Please check your configuration.');
+    }
+    if (error.message) {
+      throw error;
+    }
+    
+    throw new Error('Failed to inpaint image. Please try again.');
+  }
+}
+
 async function pollForImageResults(
   requestId: string,
   maxAttempts: number = 30

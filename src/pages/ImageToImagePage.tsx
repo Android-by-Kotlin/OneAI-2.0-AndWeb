@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Upload, Sparkles, Download, Share2, Clock, AlertCircle, X, Plus } from 'lucide-react';
-import { transformImageSingle, transformImageDual } from '../services/imageToImageService';
+import { ArrowLeft, Upload, Sparkles, Download, Share2, Clock, AlertCircle, X, Plus, Brush, Eraser } from 'lucide-react';
+import { transformImageSingle, transformImageDual, inpaintImage } from '../services/imageToImageService';
 import { downloadImage, shareImage } from '../services/imageGenerationService';
 
 const ImageToImagePage = () => {
   const navigate = useNavigate();
+  const [mode, setMode] = useState<'transform' | 'inpaint'>('transform');
   const [prompt, setPrompt] = useState('');
   const [image1, setImage1] = useState<File | null>(null);
   const [image1Preview, setImage1Preview] = useState<string | null>(null);
@@ -19,6 +20,12 @@ const ImageToImagePage = () => {
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   const fileInput1Ref = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
+  
+  // Inpainting states
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [brushSize, setBrushSize] = useState(20);
+  const [tool, setTool] = useState<'brush' | 'eraser'>('brush');
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
