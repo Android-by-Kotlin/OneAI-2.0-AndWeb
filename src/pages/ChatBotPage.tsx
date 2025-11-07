@@ -4,6 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Send, Loader, Trash2, Settings } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
 
+// Typing effect component
+const TypingText = ({ text, speed = 20 }: { text: string; speed?: number }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, text, speed]);
+
+  return <span>{displayedText}</span>;
+};
+
 const ChatBotPage = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -12,6 +30,7 @@ const ChatBotPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('models/gemini-2.0-flash');
   const [showSettings, setShowSettings] = useState(false);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -51,6 +70,12 @@ const ChatBotPage = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setTypingMessageId(assistantMessage.id);
+      
+      // Clear typing effect after animation completes
+      setTimeout(() => {
+        setTypingMessageId(null);
+      }, response.length * 20 + 500);
     } catch (err: any) {
       setError(err.message || 'Failed to get response');
       console.error('Chat error:', err);
@@ -176,7 +201,13 @@ const ChatBotPage = () => {
                     : 'glass text-white'
                 }`}
               >
-                <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                <div className="whitespace-pre-wrap break-words">
+                  {message.role === 'assistant' && typingMessageId === message.id ? (
+                    <TypingText text={message.content} speed={20} />
+                  ) : (
+                    message.content
+                  )}
+                </div>
                 <div className="text-xs opacity-60 mt-2">
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
