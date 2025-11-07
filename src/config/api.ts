@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Note: In production, these should be in environment variables
-  GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY || '',
+  GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCrWF3Wq9tN1-0IsWRoVC0MVhE0kS0YXeY',
   OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY || '',
   IMAGE_GEN_API_KEY: import.meta.env.VITE_IMAGE_GEN_API_KEY || '',
   VIDEO_GEN_API_KEY: import.meta.env.VITE_VIDEO_GEN_API_KEY || '',
