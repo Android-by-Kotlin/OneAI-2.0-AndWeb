@@ -5,7 +5,7 @@ import { ArrowLeft, Send, Loader, Trash2, Settings } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
 
 // Typing effect component
-const TypingText = ({ text, speed = 20 }: { text: string; speed?: number }) => {
+const TypingText = ({ text, speed = 5 }: { text: string; speed?: number }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -75,7 +75,7 @@ const ChatBotPage = () => {
       // Clear typing effect after animation completes
       setTimeout(() => {
         setTypingMessageId(null);
-      }, response.length * 20 + 500);
+      }, response.length * 5 + 500);
     } catch (err: any) {
       setError(err.message || 'Failed to get response');
       console.error('Chat error:', err);
@@ -203,7 +203,7 @@ const ChatBotPage = () => {
               >
                 <div className="whitespace-pre-wrap break-words">
                   {message.role === 'assistant' && typingMessageId === message.id ? (
-                    <TypingText text={message.content} speed={20} />
+                    <TypingText text={message.content} speed={5} />
                   ) : (
                     message.content
                   )}
