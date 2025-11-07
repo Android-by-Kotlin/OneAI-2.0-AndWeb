@@ -244,7 +244,7 @@ export async function generateImageWithA4F(
       model: 'provider-4/imagen-4',
       prompt: prompt,
       n: 1,
-      size: '1024x1792'
+      size: '1080x1080'
     };
 
     const response = await axios.post<A4FImageResponse>(
