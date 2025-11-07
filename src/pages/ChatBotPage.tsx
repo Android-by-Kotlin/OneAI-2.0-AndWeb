@@ -5,7 +5,7 @@ import { ArrowLeft, Send, Loader, Trash2, Settings } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
 
 // Typing effect component
-const TypingText = ({ text, speed = 5 }: { text: string; speed?: number }) => {
+const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -14,10 +14,14 @@ const TypingText = ({ text, speed = 5 }: { text: string; speed?: number }) => {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + text[currentIndex]);
         setCurrentIndex(prev => prev + 1);
+        // Trigger scroll update
+        if (onUpdate) {
+          onUpdate();
+        }
       }, speed);
       return () => clearTimeout(timeout);
     }
-  }, [currentIndex, text, speed]);
+  }, [currentIndex, text, speed, onUpdate]);
 
   return <span>{displayedText}</span>;
 };
@@ -41,6 +45,11 @@ const ChatBotPage = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Scroll function that can be called during typing
+  const scrollDuringTyping = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleSend = async () => {
     if (!inputText.trim() || isLoading) return;
@@ -203,7 +212,7 @@ const ChatBotPage = () => {
               >
                 <div className="whitespace-pre-wrap break-words">
                   {message.role === 'assistant' && typingMessageId === message.id ? (
-                    <TypingText text={message.content} speed={5} />
+                    <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
                   ) : (
                     message.content
                   )}
