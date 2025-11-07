@@ -21,6 +21,9 @@ export const API_CONFIG = {
   
   // HeyGen API Key (for live avatars)
   HEYGEN_API_KEY: import.meta.env.VITE_HEYGEN_API_KEY || '',
+  
+  // A4F API Key (for GPT-4o-mini and other models)
+  A4F_API_KEY: import.meta.env.VITE_A4F_API_KEY || 'ddc-a4f-2e9bee7f17d640d7bcba8fb26cf48d46',
 };
 
 export const API_ENDPOINTS = {
@@ -43,6 +46,9 @@ export const API_ENDPOINTS = {
   
   // Live Avatar
   HEYGEN_STREAMING: 'https://api.heygen.com/v1/streaming',
+  
+  // A4F API
+  A4F_CHAT: 'https://api.a4f.co/v1/chat/completions',
 };
 
 export const AI_MODELS = {

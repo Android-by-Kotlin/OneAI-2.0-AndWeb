@@ -13,7 +13,7 @@ export interface Message {
 export interface ChatModel {
   id: string;
   name: string;
-  provider: 'google' | 'openrouter';
+  provider: 'google' | 'openrouter' | 'a4f';
   description: string;
 }
 
@@ -53,6 +53,24 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     name: 'Llama 3.1 70B',
     provider: 'openrouter',
     description: 'Meta\'s open source model'
+  },
+  {
+    id: 'provider-5/gpt-4o-mini',
+    name: 'GPT-4o Mini',
+    provider: 'a4f',
+    description: 'Fast and efficient GPT-4o mini via A4F'
+  },
+  {
+    id: 'provider-5/gpt-4o',
+    name: 'GPT-4o',
+    provider: 'a4f',
+    description: 'Latest GPT-4o model via A4F'
+  },
+  {
+    id: 'provider-5/o1-mini',
+    name: 'O1 Mini',
+    provider: 'a4f',
+    description: 'Reasoning-focused O1 mini via A4F'
   }
 ];
 
@@ -179,6 +197,69 @@ async function sendToOpenRouter(
 }
 
 /**
+ * Send message to A4F (for GPT-4o, GPT-4o-mini, O1, etc.)
+ */
+async function sendToA4F(
+  message: string,
+  modelId: string,
+  conversationHistory: Message[] = []
+): Promise<string> {
+  try {
+    const apiKey = API_CONFIG.A4F_API_KEY;
+    
+    if (!apiKey || apiKey === '') {
+      throw new Error('A4F API key not configured');
+    }
+
+    // Build messages array with history
+    const messages = [
+      ...conversationHistory.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      {
+        role: 'user' as const,
+        content: message
+      }
+    ];
+
+    const response = await axios.post(
+      API_ENDPOINTS.A4F_CHAT,
+      {
+        model: modelId,
+        messages: messages,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (response.data?.choices?.[0]?.message?.content) {
+      return cleanResponseText(response.data.choices[0].message.content);
+    }
+    
+    throw new Error('Invalid response from A4F');
+  } catch (error: any) {
+    console.error('A4F API error:', error);
+    
+    if (error.response?.status === 401) {
+      throw new Error('Invalid A4F API key. Please check your configuration.');
+    }
+    if (error.response?.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again later.');
+    }
+    if (error.response?.data?.error?.message) {
+      throw new Error(`A4F error: ${error.response.data.error.message}`);
+    }
+    
+    throw new Error(`A4F error: ${error.message || 'Unknown error occurred'}`);
+  }
+}
+
+/**
  * Main function to send message to selected model
  */
 export async function sendMessage(
@@ -196,6 +277,8 @@ export async function sendMessage(
     return sendToGemini(message, modelId, conversationHistory);
   } else if (model.provider === 'openrouter') {
     return sendToOpenRouter(message, modelId, conversationHistory);
+  } else if (model.provider === 'a4f') {
+    return sendToA4F(message, modelId, conversationHistory);
   }
   
   throw new Error(`Unknown provider: ${model.provider}`);
