@@ -9,7 +9,7 @@ import ImageToImagePage from './pages/ImageToImagePage';
 import ChatBotPage from './pages/ChatBotPage';
 import VideoGenerationPage from './pages/VideoGenerationPage';
 import ImageToVideoPage from './pages/ImageToVideoPage';
-import SketchToImagePage from './pages/SketchToImagePage';
+import SketchToImagePage from './pages/Inpainting';
 import LiveAvatarPage from './pages/LiveAvatarPage';
 
 // Protected Route Component

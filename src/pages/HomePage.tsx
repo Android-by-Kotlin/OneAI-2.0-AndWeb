@@ -63,8 +63,8 @@ const HomePage = () => {
       route: '/image-to-video',
     },
     {
-      title: 'Sketch to Image',
-      description: 'Turn your sketches into realistic images',
+      title: 'Inpainting',
+      description: 'Fill or edit specific areas of your images with AI',
       icon: <Wand2 className="w-8 h-8" />,
       gradient: 'from-indigo-500 to-purple-500',
       route: '/sketch-to-image',
