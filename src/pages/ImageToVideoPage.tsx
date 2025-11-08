@@ -1,16 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon, Upload } from 'lucide-react';
+import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon } from 'lucide-react';
 import { generateImageToVideo, pollForImageToVideo } from '../services/imageToVideoService';
 
 const ImageToVideoPage = () => {
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [imageUrl, setImageUrl] = useState<string>('');
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [prompt, setPrompt] = useState('');
   const [negativePrompt, setNegativePrompt] = useState('blurry, low quality, distorted, artifacts, bad anatomy');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -18,54 +15,6 @@ const ImageToVideoPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   const [isPolling, setIsPolling] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please upload a valid image file');
-      return;
-    }
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image size should be less than 10MB');
-      return;
-    }
-
-    setIsUploading(true);
-    setError(null);
-
-    try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setUploadedImage(base64String);
-        setUploadedFileName(file.name);
-        setImageUrl(''); // Clear URL input when file is uploaded
-        setIsUploading(false);
-      };
-      reader.onerror = () => {
-        setError('Failed to read image file');
-        setIsUploading(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      setError('Failed to upload image');
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveUpload = () => {
-    setUploadedImage(null);
-    setUploadedFileName(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -73,11 +22,8 @@ const ImageToVideoPage = () => {
       return;
     }
 
-    // Use uploaded image or URL
-    const finalImageUrl = uploadedImage || imageUrl.trim();
-
-    if (!finalImageUrl) {
-      setError('Please upload an image or provide an image URL');
+    if (!imageUrl.trim()) {
+      setError('Please provide an image URL');
       return;
     }
 
@@ -87,7 +33,7 @@ const ImageToVideoPage = () => {
     setGenerationTime(null);
 
     try {
-      const result = await generateImageToVideo(finalImageUrl, prompt, negativePrompt);
+      const result = await generateImageToVideo(imageUrl.trim(), prompt, negativePrompt);
       
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
@@ -152,91 +98,29 @@ const ImageToVideoPage = () => {
               <p className="text-gray-400 text-sm">Using Seedance I2V Model</p>
             </div>
 
-            {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Upload Image *
-              </label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={isGenerating || isUploading}
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isGenerating || isUploading || !!uploadedImage}
-                className="w-full py-3 bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-primary/50 hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Uploading...
-                  </>
-                ) : uploadedImage ? (
-                  <>
-                    <ImageIcon className="w-5 h-5" />
-                    {uploadedFileName}
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-5 h-5" />
-                    Click to upload image
-                  </>
-                )}
-              </button>
-              <p className="text-xs text-gray-500 mt-1">Max size: 10MB</p>
-            </div>
-
-            {/* Uploaded Image Preview */}
-            {uploadedImage && (
-              <div className="relative">
-                <img 
-                  src={uploadedImage} 
-                  alt="Uploaded" 
-                  className="w-full h-32 object-cover rounded-lg"
-                />
-                <button
-                  onClick={handleRemoveUpload}
-                  className="absolute top-2 right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full text-white transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
-            {/* OR Divider */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-px bg-gray-700"></div>
-              <span className="text-xs text-gray-500">OR</span>
-              <div className="flex-1 h-px bg-gray-700"></div>
-            </div>
-
             {/* Image URL Input */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Image URL
+                Image URL *
               </label>
               <input
                 type="text"
                 value={imageUrl}
-                onChange={(e) => {
-                  setImageUrl(e.target.value);
-                  if (e.target.value) {
-                    handleRemoveUpload(); // Clear upload if URL is entered
-                  }
-                }}
+                onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://example.com/image.jpg"
                 className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                disabled={isGenerating || !!uploadedImage}
+                disabled={isGenerating}
               />
-              <p className="text-xs text-gray-500 mt-1">Or enter a publicly accessible image URL</p>
+              <p className="text-xs text-gray-500 mt-1">Enter a publicly accessible image URL</p>
+              <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p className="text-xs text-blue-300">
+                  💡 <strong>Tip:</strong> Upload your image to <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">ImgBB.com</a> or <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">PostImages.org</a> to get a public URL
+                </p>
+              </div>
             </div>
 
-            {/* URL Image Preview */}
-            {imageUrl && !uploadedImage && (
+            {/* Image Preview */}
+            {imageUrl && (
               <div className="relative">
                 <img 
                   src={imageUrl} 
@@ -294,7 +178,7 @@ const ImageToVideoPage = () => {
             {/* Generate Button */}
             <button
               onClick={handleGenerate}
-              disabled={isGenerating || !prompt.trim() || (!imageUrl.trim() && !uploadedImage)}
+              disabled={isGenerating || !prompt.trim() || !imageUrl.trim()}
               className="w-full py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isGenerating ? (
