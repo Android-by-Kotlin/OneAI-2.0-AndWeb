@@ -32,6 +32,7 @@ const LiveAvatarPage = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [isAvatarSpeaking, setIsAvatarSpeaking] = useState(false);
 
   // Check if API key is configured
   useEffect(() => {
@@ -79,10 +80,12 @@ const LiveAvatarPage = () => {
       // Set up event listeners
       avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
         console.log('Avatar started talking');
+        setIsAvatarSpeaking(true);
       });
 
       avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
         console.log('Avatar stopped talking');
+        setIsAvatarSpeaking(false);
       });
 
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
@@ -133,6 +136,12 @@ const LiveAvatarPage = () => {
 
   // Stop streaming session
   const handleDisconnect = async () => {
+    // Stop voice listening if active
+    if (isListening && speechRecognitionRef.current) {
+      speechRecognitionRef.current.stop();
+      setIsListening(false);
+    }
+
     if (avatarRef.current) {
       await avatarRef.current.stopAvatar();
       avatarRef.current = null;
@@ -146,15 +155,29 @@ const LiveAvatarPage = () => {
     setConnectionState('disconnected');
     setMessages([]);
     setStream(null);
+    setIsAvatarSpeaking(false);
     
     // Reset AI conversation
     resetConversation();
   };
 
   // Send message to avatar (can be called from text or voice input)
-  const handleSendMessage = async (text?: string) => {
+  const handleSendMessage = async (text?: string, isVoiceInput: boolean = false) => {
     const messageText = text || message.trim();
-    if (!messageText || !avatarRef.current || isSending) return;
+    if (!messageText || !avatarRef.current) return;
+
+    // If it's voice input and avatar is speaking, interrupt the avatar
+    if (isVoiceInput && isAvatarSpeaking) {
+      console.log('Interrupting avatar...');
+      try {
+        await avatarRef.current.interrupt();
+      } catch (err) {
+        console.error('Failed to interrupt avatar:', err);
+      }
+    }
+
+    // Don't process if already sending (unless it's an interruption)
+    if (isSending && !isVoiceInput) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -191,41 +214,49 @@ const LiveAvatarPage = () => {
     }
   };
 
-  // Handle voice input
+  // Handle voice input - continuous mode
   const handleVoiceInput = () => {
     if (!speechRecognitionRef.current || !isConnected) return;
 
     if (isListening) {
       // Stop listening
+      console.log('Stopping continuous voice listening');
       speechRecognitionRef.current.stop();
       setIsListening(false);
     } else {
-      // Start listening
+      // Start continuous listening
+      console.log('Starting continuous voice listening');
       setIsListening(true);
       setError(null);
       
       speechRecognitionRef.current.start(
-        // On result
+        // On result - this will be called for each speech segment
         (text) => {
-          console.log('Voice input:', text);
-          setIsListening(false);
-          handleSendMessage(text);
+          console.log('Voice input detected:', text);
+          // Process the voice input (can interrupt avatar if speaking)
+          handleSendMessage(text, true);
+          // Service now automatically restarts to keep listening
         },
         // On error
         (error) => {
           console.error('Speech recognition error:', error);
-          setIsListening(false);
           if (error === 'not-allowed') {
             setError('Microphone access denied. Please allow microphone access.');
+            setIsListening(false);
+          } else if (error === 'aborted') {
+            // User manually stopped - this is ok
+            setIsListening(false);
           } else if (error === 'no-speech') {
-            setError('No speech detected. Please try again.');
+            // In continuous mode, no-speech is normal - just keep listening
+            console.log('No speech detected, continuing to listen...');
           } else {
-            setError(`Voice input error: ${error}`);
+            console.warn(`Voice input error: ${error}, but continuing...`);
+            // Don't stop listening on minor errors in continuous mode
           }
         },
-        // On end
+        // On end callback - not needed for restart, service handles it
         () => {
-          setIsListening(false);
+          console.log('Speech recognition cycle completed');
         }
       );
     }
@@ -394,9 +425,26 @@ const LiveAvatarPage = () => {
             animate={{ opacity: 1, x: 0 }}
             className="glass rounded-2xl p-6 flex flex-col"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <Mic className="w-6 h-6 text-primary" />
-              <h2 className="text-xl font-bold text-white">Conversation</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Mic className="w-6 h-6 text-primary" />
+                <h2 className="text-xl font-bold text-white">Conversation</h2>
+              </div>
+              {/* Status indicators */}
+              <div className="flex items-center gap-2">
+                {isListening && (
+                  <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    Listening
+                  </span>
+                )}
+                {isAvatarSpeaking && (
+                  <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                    Speaking
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Messages */}
@@ -429,16 +477,24 @@ const LiveAvatarPage = () => {
             </div>
 
             {/* Input */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSendMessage()}
-                placeholder={isListening ? "Listening..." : "Type a message..."}
-                disabled={!isConnected || isSending || isListening}
-                className="flex-1 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm disabled:opacity-50"
-              />
+            <div className="space-y-2">
+              {/* Status message */}
+              {isListening && (
+                <div className="text-xs text-gray-400 text-center">
+                  🎤 Voice mode active - speak anytime (you can interrupt the avatar)
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSendMessage()}
+                  placeholder={isListening ? "🎤 Listening..." : "Type a message..."}
+                  disabled={!isConnected || isSending || isListening}
+                  className="flex-1 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm disabled:opacity-50"
+                />
               {isSpeechSupported && (
                 <button
                   onClick={handleVoiceInput}
@@ -468,6 +524,7 @@ const LiveAvatarPage = () => {
                   <Send className="w-5 h-5" />
                 )}
               </button>
+            </div>
             </div>
           </motion.div>
         </div>

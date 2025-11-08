@@ -16,17 +16,29 @@ export class SpeechRecognitionService {
     }
 
     this.recognition = new SpeechRecognition();
-    this.recognition.continuous = false; // Stop after one result
-    this.recognition.interimResults = false; // Only final results
+    this.recognition.continuous = true; // Keep listening continuously
+    this.recognition.interimResults = false; // Only get final results
     this.recognition.lang = 'en-US';
     this.recognition.maxAlternatives = 1;
 
     // Set up event listeners
     this.recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      console.log('Speech recognized:', transcript);
-      if (this.onResultCallback) {
-        this.onResultCallback(transcript);
+      // Process all new results since last time
+      const results = event.results;
+      
+      // Loop through results starting from the resultIndex
+      for (let i = event.resultIndex; i < results.length; i++) {
+        const result = results[i];
+        
+        // Only process final results (complete sentences)
+        if (result.isFinal) {
+          const transcript = result[0].transcript.trim();
+          console.log('Final speech recognized:', transcript);
+          
+          if (transcript && this.onResultCallback) {
+            this.onResultCallback(transcript);
+          }
+        }
       }
     };
 
@@ -39,8 +51,19 @@ export class SpeechRecognitionService {
     };
 
     this.recognition.onend = () => {
-      console.log('Speech recognition ended');
-      this.isListening = false;
+      console.log('Speech recognition ended, isListening:', this.isListening);
+      
+      // In continuous mode, automatically restart if still supposed to be listening
+      if (this.isListening) {
+        console.log('Auto-restarting speech recognition...');
+        try {
+          this.recognition.start();
+        } catch (error) {
+          console.error('Failed to restart recognition:', error);
+          this.isListening = false;
+        }
+      }
+      
       if (this.onEndCallback) {
         this.onEndCallback();
       }
