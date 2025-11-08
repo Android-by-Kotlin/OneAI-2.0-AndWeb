@@ -2,12 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mic, Send, Power, Loader2, AlertCircle, Video as VideoIcon } from 'lucide-react';
-import { 
-  createStreamingSession, 
-  sendAvatarTask, 
-  stopStreamingSession,
-  WebRTCConnection 
-} from '../services/liveAvatarService';
+import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
+import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
 
 interface Message {
@@ -20,17 +16,17 @@ interface Message {
 const LiveAvatarPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const webRTCRef = useRef<WebRTCConnection | null>(null);
+  const avatarRef = useRef<StreamingAvatar | null>(null);
   
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<string>('disconnected');
   const [hasApiKey, setHasApiKey] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   // Check if API key is configured
   useEffect(() => {
@@ -48,42 +44,55 @@ const LiveAvatarPage = () => {
     setError(null);
 
     try {
-      // Create streaming session
-      const session = await createStreamingSession();
-      setSessionId(session.session_id);
+      // Get access token
+      const token = await getHeyGenAccessToken();
 
-      // Initialize WebRTC connection
-      const webRTC = new WebRTCConnection();
-      webRTCRef.current = webRTC;
+      // Initialize avatar
+      const avatar = new StreamingAvatar({ token });
+      avatarRef.current = avatar;
 
-      // Handle incoming video stream
-      webRTC.onTrack((stream) => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+      // Set up event listeners
+      avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
+        console.log('Avatar started talking');
       });
 
-      // Handle connection state changes
-      webRTC.onStateChange((state) => {
-        setConnectionState(state);
-        if (state === 'connected') {
-          setIsConnected(true);
-          setIsConnecting(false);
-          // Send welcome message from avatar
-          setMessages([{
-            id: Date.now().toString(),
-            text: 'Hello! I\'m your AI avatar. How can I help you today?',
-            sender: 'avatar',
-            timestamp: new Date()
-          }]);
-        } else if (state === 'failed' || state === 'disconnected') {
-          setIsConnected(false);
-          setIsConnecting(false);
-        }
+      avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
+        console.log('Avatar stopped talking');
       });
 
-      // Initialize connection
-      await webRTC.initialize(session.sdp, session.ice_servers);
+      avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
+        console.log('Stream disconnected');
+        setIsConnected(false);
+        setConnectionState('disconnected');
+      });
+
+      avatar.on(StreamingEvents.STREAM_READY, (event) => {
+        console.log('Stream ready:', event);
+        setConnectionState('connected');
+        setIsConnected(true);
+        setIsConnecting(false);
+        
+        // Set video stream
+        if (event.detail && videoRef.current) {
+          videoRef.current.srcObject = event.detail;
+          setStream(event.detail);
+        }
+
+        // Send welcome message
+        setMessages([{
+          id: Date.now().toString(),
+          text: 'Hello! I\'m your AI avatar. How can I help you today?',
+          sender: 'avatar',
+          timestamp: new Date()
+        }]);
+      });
+
+      // Start avatar session
+      await avatar.createStartAvatar({
+        quality: AvatarQuality.Low,
+        avatarName: 'default', // You can customize this
+        language: 'en',
+      });
 
     } catch (err: any) {
       console.error('Connection error:', err);
@@ -95,13 +104,9 @@ const LiveAvatarPage = () => {
 
   // Stop streaming session
   const handleDisconnect = async () => {
-    if (sessionId) {
-      await stopStreamingSession(sessionId);
-    }
-    
-    if (webRTCRef.current) {
-      webRTCRef.current.close();
-      webRTCRef.current = null;
+    if (avatarRef.current) {
+      await avatarRef.current.stopAvatar();
+      avatarRef.current = null;
     }
 
     if (videoRef.current) {
@@ -109,14 +114,14 @@ const LiveAvatarPage = () => {
     }
 
     setIsConnected(false);
-    setSessionId(null);
     setConnectionState('disconnected');
     setMessages([]);
+    setStream(null);
   };
 
   // Send message to avatar
   const handleSendMessage = async () => {
-    if (!message.trim() || !sessionId || isSending) return;
+    if (!message.trim() || !avatarRef.current || isSending) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -130,12 +135,12 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
-      await sendAvatarTask(sessionId, userMessage.text);
+      await avatarRef.current.speak({ text: userMessage.text });
       
-      // Add avatar response placeholder
+      // Add avatar response
       const avatarMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: userMessage.text, // Avatar will speak the same text
+        text: userMessage.text,
         sender: 'avatar',
         timestamp: new Date()
       };
@@ -150,14 +155,18 @@ const LiveAvatarPage = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (sessionId) {
-        stopStreamingSession(sessionId);
-      }
-      if (webRTCRef.current) {
-        webRTCRef.current.close();
+      if (avatarRef.current) {
+        avatarRef.current.stopAvatar();
       }
     };
-  }, [sessionId]);
+  }, []);
+
+  // Update video element when stream changes
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-6">

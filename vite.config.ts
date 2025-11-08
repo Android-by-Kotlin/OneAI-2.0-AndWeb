@@ -9,6 +9,7 @@ export default defineConfig({
       '/api/heygen': {
         target: 'https://api.heygen.com',
         changeOrigin: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api\/heygen/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
