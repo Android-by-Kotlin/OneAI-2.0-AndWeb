@@ -60,12 +60,13 @@ const LiveAvatarPage = () => {
         console.log('Avatar stopped talking');
       });
 
-      avatar.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (event) => {
-        console.log('Avatar talking message:', event);
+      // Use AVATAR_END_MESSAGE to get complete sentences instead of individual characters
+      avatar.on(StreamingEvents.AVATAR_END_MESSAGE, (event) => {
+        console.log('Avatar end message:', event);
         const text = event.detail?.message || event.detail?.text;
-        if (text) {
+        if (text && text.trim()) {
           const avatarMessage: Message = {
-            id: `avatar-${Date.now()}-${Math.random()}`, // Unique ID
+            id: `avatar-${Date.now()}-${Math.random()}`,
             text: text,
             sender: 'avatar',
             timestamp: new Date()
