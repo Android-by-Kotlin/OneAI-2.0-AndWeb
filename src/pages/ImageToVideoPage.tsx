@@ -114,11 +114,11 @@ const ImageToVideoPage = () => {
 
             {/* Image Preview */}
             {imageUrl && (
-              <div className="relative">
+              <div className="relative bg-gray-800/50 rounded-lg" style={{ height: '200px' }}>
                 <img 
                   src={imageUrl} 
                   alt="Input" 
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-full object-contain rounded-lg"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
