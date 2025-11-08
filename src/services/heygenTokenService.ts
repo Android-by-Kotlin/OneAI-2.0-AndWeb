@@ -10,9 +10,8 @@ export async function getHeyGenAccessToken(): Promise<string> {
       throw new Error('HeyGen API key is not configured');
     }
 
-    const endpoint = import.meta.env.DEV 
-      ? '/api/heygen/v1/streaming.create_token'
-      : 'https://api.heygen.com/v1/streaming.create_token';
+    // Always call the API directly - HeyGen supports CORS
+    const endpoint = 'https://api.heygen.com/v1/streaming.create_token';
 
     const response = await axios.post(
       endpoint,

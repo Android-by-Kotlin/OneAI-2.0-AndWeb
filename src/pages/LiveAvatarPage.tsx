@@ -5,7 +5,6 @@ import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as Vid
 import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
 import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
-import { initializeAI, getAIResponse, resetConversation } from '../services/aiChatService';
 import { SpeechRecognitionService } from '../services/speechRecognitionService';
 
 interface Message {
@@ -39,14 +38,8 @@ const LiveAvatarPage = () => {
     setHasApiKey(!!API_CONFIG.HEYGEN_API_KEY);
   }, []);
 
-  // Initialize AI and Speech Recognition on component mount
+  // Initialize Speech Recognition on component mount
   useEffect(() => {
-    try {
-      initializeAI();
-    } catch (err) {
-      console.error('Failed to initialize AI:', err);
-    }
-
     // Initialize speech recognition
     const speechService = new SpeechRecognitionService();
     speechRecognitionRef.current = speechService;
@@ -113,7 +106,7 @@ const LiveAvatarPage = () => {
         // Send welcome message
         setMessages([{
           id: Date.now().toString(),
-          text: 'Hello! I\'m your AI avatar. How can I help you today?',
+          text: 'Hello! I\'m your live avatar. I will repeat everything you say!',
           sender: 'avatar',
           timestamp: new Date()
         }]);
@@ -156,9 +149,6 @@ const LiveAvatarPage = () => {
     setMessages([]);
     setStream(null);
     setIsAvatarSpeaking(false);
-    
-    // Reset AI conversation
-    resetConversation();
   };
 
   // Send message to avatar (can be called from text or voice input)
@@ -191,17 +181,13 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
-      // Get AI response
-      const aiResponse = await getAIResponse(messageText);
-      console.log('AI Response:', aiResponse);
+      // Avatar speaks the exact user input (no AI processing)
+      await avatarRef.current.speak({ text: messageText });
       
-      // Make the avatar speak the AI response
-      await avatarRef.current.speak({ text: aiResponse });
-      
-      // Add avatar message showing what it's speaking
+      // Add avatar message showing what it's speaking (same as user input)
       const avatarMessage: Message = {
         id: `avatar-speaking-${Date.now()}`,
-        text: aiResponse,
+        text: messageText,
         sender: 'avatar',
         timestamp: new Date()
       };
