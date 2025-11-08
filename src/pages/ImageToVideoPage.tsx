@@ -9,7 +9,6 @@ const ImageToVideoPage = () => {
   
   const [imageUrl, setImageUrl] = useState<string>('');
   const [prompt, setPrompt] = useState('');
-  const [negativePrompt, setNegativePrompt] = useState('blurry, low quality, distorted, artifacts, bad anatomy');
   const [isGenerating, setIsGenerating] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +16,13 @@ const ImageToVideoPage = () => {
   const [isPolling, setIsPolling] = useState(false);
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError('Please enter a prompt');
+    if (!imageUrl.trim()) {
+      setError('Please enter an image URL');
       return;
     }
 
-    if (!imageUrl.trim()) {
-      setError('Please provide an image URL');
+    if (!prompt.trim()) {
+      setError('Please enter a prompt');
       return;
     }
 
@@ -33,7 +32,7 @@ const ImageToVideoPage = () => {
     setGenerationTime(null);
 
     try {
-      const result = await generateImageToVideo(imageUrl.trim(), prompt, negativePrompt);
+      const result = await generateImageToVideo(imageUrl.trim(), prompt, '');
       
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
@@ -111,12 +110,6 @@ const ImageToVideoPage = () => {
                 className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                 disabled={isGenerating}
               />
-              <p className="text-xs text-gray-500 mt-1">Enter a publicly accessible image URL</p>
-              <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <p className="text-xs text-blue-300">
-                  💡 <strong>Tip:</strong> Upload your image to <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">ImgBB.com</a> or <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">PostImages.org</a> to get a public URL
-                </p>
-              </div>
             </div>
 
             {/* Image Preview */}
@@ -125,7 +118,7 @@ const ImageToVideoPage = () => {
                 <img 
                   src={imageUrl} 
                   alt="Input" 
-                  className="w-full h-32 object-cover rounded-lg"
+                  className="w-full h-48 object-cover rounded-lg"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -148,37 +141,13 @@ const ImageToVideoPage = () => {
               />
             </div>
 
-            {/* Negative Prompt */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Negative Prompt
-              </label>
-              <textarea
-                value={negativePrompt}
-                onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="blurry, low quality, distorted..."
-                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm"
-                rows={2}
-                disabled={isGenerating}
-              />
-            </div>
-
             {/* Spacer */}
             <div className="flex-1"></div>
-
-            {/* Settings Info */}
-            <div className="bg-gray-800/30 rounded-lg p-3 space-y-2">
-              <h3 className="text-xs font-medium text-gray-300">Settings</h3>
-              <div className="text-xs text-gray-400">
-                <div>Seedance I2V</div>
-                <div>Auto duration</div>
-              </div>
-            </div>
 
             {/* Generate Button */}
             <button
               onClick={handleGenerate}
-              disabled={isGenerating || !prompt.trim() || !imageUrl.trim()}
+              disabled={isGenerating || !imageUrl.trim() || !prompt.trim()}
               className="w-full py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isGenerating ? (
@@ -260,7 +229,6 @@ const ImageToVideoPage = () => {
                 <div className="text-center text-gray-500">
                   <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-30" />
                   <p>Your video will appear here</p>
-                  <p className="text-sm mt-2">Provide an image URL and describe the motion</p>
                 </div>
               )}
             </div>
