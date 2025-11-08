@@ -83,7 +83,7 @@ const VideoGenerationPage = () => {
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 space-y-4 lg:col-span-1 h-fit"
+            className="glass rounded-2xl p-6 space-y-4 lg:col-span-1 flex flex-col"
           >
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -122,6 +122,9 @@ const VideoGenerationPage = () => {
                 disabled={isGenerating}
               />
             </div>
+
+            {/* Spacer to push settings and button to bottom */}
+            <div className="flex-1"></div>
 
             {/* Video Settings Info */}
             <div className="bg-gray-800/30 rounded-lg p-3 space-y-2">
