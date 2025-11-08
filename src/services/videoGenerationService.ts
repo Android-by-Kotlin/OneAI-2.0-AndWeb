@@ -57,7 +57,7 @@ export async function generateVideo(
       num_frames: '25',
       num_inference_steps: '20',
       guidance_scale: '7.0',
-      fps: '5',
+      fps: '16',
       seed: null,
       webhook: null,
       track_id: null

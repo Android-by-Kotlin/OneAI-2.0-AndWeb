@@ -133,7 +133,7 @@ const VideoGenerationPage = () => {
                 <div>480p</div>
                 <div>25 frames</div>
                 <div>Seedance</div>
-                <div>5 FPS (5 sec)</div>
+                <div>16 FPS (~1.5s)</div>
               </div>
             </div>
 
