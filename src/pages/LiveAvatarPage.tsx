@@ -5,6 +5,7 @@ import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as Vid
 import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
 import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
+import { initializeAI, getAIResponse, resetConversation } from '../services/aiChatService';
 import { SpeechRecognitionService } from '../services/speechRecognitionService';
 
 interface Message {
@@ -32,14 +33,22 @@ const LiveAvatarPage = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useState(false);
+  const currentAvatarMessageIdRef = useRef<string | null>(null);
+  const avatarMessageBufferRef = useRef<string>('');
 
   // Check if API key is configured
   useEffect(() => {
     setHasApiKey(!!API_CONFIG.HEYGEN_API_KEY);
   }, []);
 
-  // Initialize Speech Recognition on component mount
+  // Initialize AI and Speech Recognition on component mount
   useEffect(() => {
+    try {
+      initializeAI();
+    } catch (err) {
+      console.error('Failed to initialize AI:', err);
+    }
+
     // Initialize speech recognition
     const speechService = new SpeechRecognitionService();
     speechRecognitionRef.current = speechService;
@@ -74,11 +83,46 @@ const LiveAvatarPage = () => {
       avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
         console.log('Avatar started talking');
         setIsAvatarSpeaking(true);
+        // Create a new message when avatar starts talking
+        const messageId = `avatar-${Date.now()}`;
+        currentAvatarMessageIdRef.current = messageId;
+        avatarMessageBufferRef.current = '';
+        
+        // Add initial empty message
+        const avatarMessage: Message = {
+          id: messageId,
+          text: '',
+          sender: 'avatar',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, avatarMessage]);
       });
 
       avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
         console.log('Avatar stopped talking');
         setIsAvatarSpeaking(false);
+        // Clear the buffer when done
+        avatarMessageBufferRef.current = '';
+        currentAvatarMessageIdRef.current = null;
+      });
+
+      // Capture what avatar actually speaks word by word
+      avatar.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (event: any) => {
+        const spokenWord = event.detail?.message || event.detail?.text || '';
+        if (spokenWord && currentAvatarMessageIdRef.current) {
+          // Append word to buffer
+          avatarMessageBufferRef.current += (avatarMessageBufferRef.current ? ' ' : '') + spokenWord;
+          
+          // Update the existing message with accumulated text
+          const messageId = currentAvatarMessageIdRef.current;
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === messageId
+                ? { ...msg, text: avatarMessageBufferRef.current }
+                : msg
+            )
+          );
+        }
       });
 
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
@@ -106,7 +150,7 @@ const LiveAvatarPage = () => {
         // Send welcome message
         setMessages([{
           id: Date.now().toString(),
-          text: 'Hello! I\'m your live avatar. I will repeat everything you say!',
+          text: 'Hello! I\'m your AI avatar. How can I help you today?',
           sender: 'avatar',
           timestamp: new Date()
         }]);
@@ -149,6 +193,9 @@ const LiveAvatarPage = () => {
     setMessages([]);
     setStream(null);
     setIsAvatarSpeaking(false);
+    
+    // Reset AI conversation
+    resetConversation();
   };
 
   // Send message to avatar (can be called from text or voice input)
@@ -181,17 +228,13 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
-      // Avatar speaks the exact user input (no AI processing)
-      await avatarRef.current.speak({ text: messageText });
+      // Get AI response
+      const aiResponse = await getAIResponse(messageText);
+      console.log('AI Response:', aiResponse);
       
-      // Add avatar message showing what it's speaking (same as user input)
-      const avatarMessage: Message = {
-        id: `avatar-speaking-${Date.now()}`,
-        text: messageText,
-        sender: 'avatar',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, avatarMessage]);
+      // Make the avatar speak the AI response
+      // The AVATAR_TALKING_MESSAGE event will handle adding the message to chat
+      await avatarRef.current.speak({ text: aiResponse });
     } catch (err: any) {
       console.error('Error:', err);
       setError(err.message || 'Failed to send message');
