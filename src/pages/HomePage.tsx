@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import {
   Image,
   MessageSquare,
-  Video,
   Palette,
   Wand2,
   User2,
@@ -48,13 +47,6 @@ const HomePage = () => {
       icon: <MessageSquare className="w-8 h-8" />,
       gradient: 'from-green-500 to-emerald-500',
       route: '/chatbot',
-    },
-    {
-      title: 'Video Generation',
-      description: 'Create stunning videos from text descriptions',
-      icon: <Video className="w-8 h-8" />,
-      gradient: 'from-orange-500 to-red-500',
-      route: '/video-generation',
     },
     {
       title: 'Image to Video',
