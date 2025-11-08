@@ -44,8 +44,8 @@ export const API_ENDPOINTS = {
   GEMINI_CHAT: 'https://generativelanguage.googleapis.com/v1beta/models',
   OPENROUTER_CHAT: 'https://openrouter.ai/api/v1/chat/completions',
   
-  // Live Avatar
-  HEYGEN_STREAMING: 'https://api.heygen.com/v1/streaming',
+  // Live Avatar (using proxy in development to avoid CORS)
+  HEYGEN_STREAMING: import.meta.env.DEV ? '/api/heygen/v1/streaming' : 'https://api.heygen.com/v1/streaming',
   
   // A4F API
   A4F_CHAT: 'https://api.a4f.co/v1/chat/completions',
