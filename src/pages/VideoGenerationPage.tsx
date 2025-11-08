@@ -62,10 +62,10 @@ const VideoGenerationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-6">
+      <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <button 
             onClick={() => navigate('/home')} 
             className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
@@ -78,12 +78,12 @@ const VideoGenerationPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
           {/* Input Section */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 space-y-4 lg:col-span-1"
+            className="glass rounded-2xl p-6 space-y-4 lg:col-span-1 h-fit"
           >
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -178,11 +178,11 @@ const VideoGenerationPage = () => {
           <motion.div 
             initial={{ opacity: 0, x: 20 }} 
             animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 lg:col-span-2"
+            className="glass rounded-2xl p-6 lg:col-span-2 flex flex-col"
           >
             <h2 className="text-xl font-bold text-white mb-4">Preview</h2>
             
-            <div className="aspect-video bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center" style={{ minHeight: '400px' }}>
+            <div className="flex-1 bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center" style={{ minHeight: '500px' }}>
               {isGenerating ? (
                 <div className="text-center">
                   <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
