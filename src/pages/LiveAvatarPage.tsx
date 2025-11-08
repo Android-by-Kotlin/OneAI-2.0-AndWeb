@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as VideoIcon } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as VideoIcon, User } from 'lucide-react';
 import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
 import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
@@ -33,6 +33,8 @@ const LiveAvatarPage = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState('Katya_Chair_Sitting_public');
+  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
 
   // Check if API key is configured
   useEffect(() => {
@@ -122,7 +124,7 @@ const LiveAvatarPage = () => {
       // Start avatar session
       await avatar.createStartAvatar({
         quality: AvatarQuality.Low,
-        avatarName: 'Katya_Chair_Sitting_public',
+        avatarName: selectedAvatar,
         language: 'en',
       });
 
@@ -335,6 +337,58 @@ const LiveAvatarPage = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">Avatar Stream</h2>
               <div className="flex items-center gap-2">
+                {/* Avatar Selector */}
+                {!isConnected && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowAvatarSelector(!showAvatarSelector)}
+                      disabled={isConnecting}
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-700/50 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    >
+                      <User className="w-4 h-4" />
+                      Avatar
+                    </button>
+                    {showAvatarSelector && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute top-full right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 overflow-hidden"
+                      >
+                        <div className="p-2 space-y-1">
+                          <button
+                            onClick={() => {
+                              setSelectedAvatar('Katya_Chair_Sitting_public');
+                              setShowAvatarSelector(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                              selectedAvatar === 'Katya_Chair_Sitting_public'
+                                ? 'bg-primary text-white'
+                                : 'text-gray-300 hover:bg-gray-700'
+                            }`}
+                          >
+                            <div className="font-medium">Katya</div>
+                            <div className="text-xs opacity-70">Chair Sitting</div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedAvatar('Marianne_Chair_Sitting_public');
+                              setShowAvatarSelector(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                              selectedAvatar === 'Marianne_Chair_Sitting_public'
+                                ? 'bg-primary text-white'
+                                : 'text-gray-300 hover:bg-gray-700'
+                            }`}
+                          >
+                            <div className="font-medium">Marianne</div>
+                            <div className="text-xs opacity-70">Chair Sitting</div>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+                
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   isConnected ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
                 }`}>
