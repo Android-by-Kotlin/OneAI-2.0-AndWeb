@@ -84,8 +84,9 @@ fun NewVideoGenerationScreen(navController: NavController) {
 
             if (state.videoUrl != null) {
                 LaunchedEffect(state.videoUrl) {
-                    // Navigate to video player screen or display the video
-                    navController.navigate("videoPlayer?videoUrl=${state.videoUrl}")
+                    // Navigate to video player screen with properly encoded URL
+                    val encodedUrl = java.net.URLEncoder.encode(state.videoUrl, "UTF-8")
+                    navController.navigate("videoPlayer?videoUrl=$encodedUrl")
                 }
             }
 

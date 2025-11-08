@@ -644,8 +644,10 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                     
                     if (responseBody.status.equals("success", true)) {
                         // Video is ready immediately
-                        if (!responseBody.outputUrls.isNullOrEmpty()) {
-                            val videoUrl = responseBody.outputUrls.first()
+                        // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                        val videoUrls = responseBody.getVideoUrls()
+                        if (!videoUrls.isNullOrEmpty()) {
+                            val videoUrl = videoUrls.first()
                             android.util.Log.d("VideoGen", "Seedance I2V video URL: $videoUrl")
                             
                             // Save to history
@@ -712,8 +714,10 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                         android.util.Log.d("VideoGen", "Seedance I2V poll status: ${responseBody.status}")
                         
                         if (responseBody.status.equals("success", true)) {
-                            if (!responseBody.outputUrls.isNullOrEmpty()) {
-                                val videoUrl = responseBody.outputUrls.first()
+                            // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                            val videoUrls = responseBody.getVideoUrls()
+                            if (!videoUrls.isNullOrEmpty()) {
+                                val videoUrl = videoUrls.first()
                                 val currentState = _state.value
                                 
                                 // Save to history
@@ -782,8 +786,10 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                     android.util.Log.d("VideoGen", "Seedance T2V response - status: ${responseBody.status}, id: ${responseBody.id}, outputUrls: ${responseBody.outputUrls}, fetchResult: ${responseBody.fetchResultUrl}")
                     
                     // Check for immediate success with video URL
-                    if (!responseBody.outputUrls.isNullOrEmpty()) {
-                        val videoUrl = responseBody.outputUrls.first()
+                    // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                    val videoUrls = responseBody.getVideoUrls()
+                    if (!videoUrls.isNullOrEmpty()) {
+                        val videoUrl = videoUrls.first()
                         android.util.Log.d("VideoGen", "Seedance T2V video ready immediately: $videoUrl")
                         
                         // Save to history
@@ -793,7 +799,7 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                             isLoading = false,
                             videoUrl = videoUrl
                         )
-                    } 
+                    }
                     // Check if we have a fetch_result URL to poll
                     else if (!responseBody.fetchResultUrl.isNullOrEmpty()) {
                         android.util.Log.d("VideoGen", "Seedance T2V has fetch_result URL: ${responseBody.fetchResultUrl}")
@@ -874,31 +880,39 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                         android.util.Log.d("VideoGen", "Seedance T2V poll - status: ${responseBody.status}, outputUrls: ${responseBody.outputUrls}, eta: ${responseBody.eta}")
                         
                         when {
-                            responseBody.status.equals("success", true) && !responseBody.outputUrls.isNullOrEmpty() -> {
-                                val videoUrl = responseBody.outputUrls.first()
-                                android.util.Log.d("VideoGen", "Seedance T2V video ready: $videoUrl")
-                                
-                                // Save to history
-                                saveVideoToHistory(prompt, videoUrl, "Seedance T2V")
-                                
-                                _state.value = _state.value.copy(
-                                    isLoading = false,
-                                    videoUrl = videoUrl
-                                )
-                                return@launch
+                            responseBody.status.equals("success", true) -> {
+                                // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                                val videoUrls = responseBody.getVideoUrls()
+                                if (!videoUrls.isNullOrEmpty()) {
+                                    val videoUrl = videoUrls.first()
+                                    android.util.Log.d("VideoGen", "Seedance T2V video ready: $videoUrl")
+                                    
+                                    // Save to history
+                                    saveVideoToHistory(prompt, videoUrl, "Seedance T2V")
+                                    
+                                    _state.value = _state.value.copy(
+                                        isLoading = false,
+                                        videoUrl = videoUrl
+                                    )
+                                    return@launch
+                                }
                             }
-                            responseBody.status.equals("completed", true) && !responseBody.outputUrls.isNullOrEmpty() -> {
-                                val videoUrl = responseBody.outputUrls.first()
-                                android.util.Log.d("VideoGen", "Seedance T2V video completed: $videoUrl")
-                                
-                                // Save to history
-                                saveVideoToHistory(prompt, videoUrl, "Seedance T2V")
-                                
-                                _state.value = _state.value.copy(
-                                    isLoading = false,
-                                    videoUrl = videoUrl
-                                )
-                                return@launch
+                            responseBody.status.equals("completed", true) -> {
+                                // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                                val videoUrls = responseBody.getVideoUrls()
+                                if (!videoUrls.isNullOrEmpty()) {
+                                    val videoUrl = videoUrls.first()
+                                    android.util.Log.d("VideoGen", "Seedance T2V video completed: $videoUrl")
+                                    
+                                    // Save to history
+                                    saveVideoToHistory(prompt, videoUrl, "Seedance T2V")
+                                    
+                                    _state.value = _state.value.copy(
+                                        isLoading = false,
+                                        videoUrl = videoUrl
+                                    )
+                                    return@launch
+                                }
                             }
                             responseBody.status.equals("failed", true) || responseBody.status.equals("error", true) -> {
                                 val errorMsg = responseBody.error ?: responseBody.message ?: "Video generation failed"
@@ -990,8 +1004,10 @@ class NewVideoGenerationViewModel(application: Application) : AndroidViewModel(a
                             if (responseBody != null) {
                                 when {
                                     responseBody.status.equals("success", true) || responseBody.status.equals("completed", true) -> {
-                                        if (!responseBody.outputUrls.isNullOrEmpty()) {
-                                            val videoUrl = responseBody.outputUrls.first()
+                                        // Use helper method to get video URLs from either 'output' or 'outputUrls' field
+                                        val videoUrls = responseBody.getVideoUrls()
+                                        if (!videoUrls.isNullOrEmpty()) {
+                                            val videoUrl = videoUrls.first()
                                             android.util.Log.d("VideoGen", "Seedance T2V video ready via fetch: $videoUrl")
                                             
                                             // Save to history

@@ -405,7 +405,8 @@ fun AppNavigation() {
                     }
                 }
             }
-            val videoUrl = backStackEntry.arguments?.getString("videoUrl") ?: ""
+            val encodedUrl = backStackEntry.arguments?.getString("videoUrl") ?: ""
+            val videoUrl = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
             VideoPlayerScreen(navController = navController, videoUrl = videoUrl)
         }
         

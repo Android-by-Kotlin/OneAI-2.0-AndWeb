@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">api.minimax.chat</domain>
         <domain includeSubdomains="true">commondatastorage.googleapis.com</domain>
+        <domain includeSubdomains="true">modelslab.com</domain>
+        <domain includeSubdomains="true">r2.dev</domain>
+        <domain includeSubdomains="true">pub-3626123a908346a7a8be8d9295f44e26.r2.dev</domain>
     </domain-config>
 </network-security-config>
