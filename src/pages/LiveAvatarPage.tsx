@@ -279,9 +279,10 @@ const LiveAvatarPage = () => {
                 autoPlay
                 playsInline
                 muted={false}
-                className={`w-full h-full object-contain ${
+                className={`w-full h-full object-cover ${
                   isConnected ? 'block' : 'hidden'
                 }`}
+                style={{ objectPosition: 'center' }}
               />
               
               {/* Loading/Placeholder states */}
