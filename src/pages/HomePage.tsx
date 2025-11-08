@@ -27,7 +27,7 @@ const HomePage = () => {
 
   const features: FeatureCard[] = [
     {
-      title: 'Text to Image',
+      title: 'Image Generation',
       description: 'Generate stunning images from text prompts using advanced AI models',
       icon: <Image className="w-8 h-8" />,
       gradient: 'from-blue-500 to-cyan-500',
