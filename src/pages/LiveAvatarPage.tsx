@@ -122,7 +122,7 @@ const LiveAvatarPage = () => {
       // Start avatar session
       await avatar.createStartAvatar({
         quality: AvatarQuality.Low,
-        avatarName: 'Anna_public_3_20240108', // Valid public avatar
+        avatarName: 'Katya_Chair_Sitting_public',
         language: 'en',
       });
 
