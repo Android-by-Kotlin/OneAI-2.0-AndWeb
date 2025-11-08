@@ -54,10 +54,10 @@ export async function generateVideo(
       aspect_ratio: '16:9',
       resolution: '480p',
       camera_fixed: null,
-      num_frames: '8',
+      num_frames: '25',
       num_inference_steps: '20',
       guidance_scale: '7.0',
-      fps: '16',
+      fps: '5',
       seed: null,
       webhook: null,
       track_id: null
@@ -78,7 +78,24 @@ export async function generateVideo(
 
     console.log('Seedance T2V response:', response.data);
 
-    // Check for immediate success with video URL
+    // Check for success status with video URLs (immediate success)
+    if (response.data.status === 'success' || response.data.status === 'completed') {
+      // Check all possible URL fields
+      const videoUrl = response.data.proxy_links?.[0] || 
+                      response.data.links?.[0] || 
+                      response.data.outputUrls?.[0] || 
+                      response.data.output?.[0];
+      
+      if (videoUrl) {
+        console.log('Seedance T2V video ready immediately (success status):', videoUrl);
+        return {
+          videoUrl: videoUrl,
+          generationTime: response.data.generationTime
+        };
+      }
+    }
+    
+    // Check for video URLs even without explicit success status
     if (response.data.outputUrls && response.data.outputUrls.length > 0) {
       const videoUrl = response.data.outputUrls[0];
       console.log('Seedance T2V video ready immediately:', videoUrl);
@@ -88,7 +105,6 @@ export async function generateVideo(
       };
     }
     
-    // Check for output field (alternative response format)
     if (response.data.output && response.data.output.length > 0) {
       const videoUrl = response.data.output[0];
       console.log('Seedance T2V video from output:', videoUrl);
@@ -98,23 +114,34 @@ export async function generateVideo(
       };
     }
     
-    // Check if we have a fetch_result URL to poll
-    if (response.data.fetch_result) {
-      console.log('Seedance T2V has fetch_result URL:', response.data.fetch_result);
-      // Need to poll using fetch_result endpoint
-      return await pollWithFetchUrl(response.data.fetch_result);
+    if (response.data.proxy_links && response.data.proxy_links.length > 0) {
+      const videoUrl = response.data.proxy_links[0];
+      console.log('Seedance T2V video from proxy_links:', videoUrl);
+      return {
+        videoUrl: videoUrl,
+        generationTime: response.data.generationTime
+      };
     }
     
-    // Check for request ID to poll
-    if (response.data.id && (response.data.status === 'processing' || response.data.status === 'pending')) {
-      console.log('Seedance T2V is processing, request ID:', response.data.id);
+    if (response.data.links && response.data.links.length > 0) {
+      const videoUrl = response.data.links[0];
+      console.log('Seedance T2V video from links:', videoUrl);
+      return {
+        videoUrl: videoUrl,
+        generationTime: response.data.generationTime
+      };
+    }
+    
+    // Check for request ID to poll (queued, processing, or pending)
+    if (response.data.id && (response.data.status === 'queued' || response.data.status === 'processing' || response.data.status === 'pending')) {
+      console.log('Seedance T2V is queued/processing, request ID:', response.data.id);
       return {
         requestId: String(response.data.id)
       };
     }
     
     // If status indicates processing but no polling mechanism available
-    if (response.data.status === 'processing' || response.data.status === 'pending') {
+    if (response.data.status === 'queued' || response.data.status === 'processing' || response.data.status === 'pending') {
       throw new Error('Video is processing. Please try again later.');
     }
     
@@ -182,8 +209,9 @@ export async function pollForVideo(
 
       // Check for success with video URLs
       if ((response.data.status === 'success' || response.data.status === 'completed') && 
-          (response.data.outputUrls || response.data.output)) {
-        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0];
+          (response.data.outputUrls || response.data.output || response.data.proxy_links || response.data.links)) {
+        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0] || 
+                        response.data.proxy_links?.[0] || response.data.links?.[0];
         if (videoUrl) {
           console.log('Seedance T2V video ready:', videoUrl);
           return {
@@ -206,22 +234,39 @@ export async function pollForVideo(
       // Continue polling if still processing
     } catch (error: any) {
       console.error(`Seedance T2V poll error on attempt ${attempt + 1}:`, error.message);
+      
+      // If error is 405 Method Not Allowed, stop immediately
+      if (error.response?.status === 405) {
+        console.error('GET method not supported for this endpoint. Stopping poll.');
+        throw new Error('Unable to check video status. The video may be ready at the provided URL.');
+      }
+      
+      // Stop on final attempt
       if (attempt === maxAttempts - 1) {
         throw new Error('Request timed out. Please try again.');
       }
-      // Continue polling on error unless it's the last attempt
+      
+      // Stop on repeated errors after 5 attempts
+      if (attempt >= 5 && error.response?.status) {
+        console.error('Multiple polling errors. Stopping.');
+        throw new Error('Unable to check video status. Please try again later.');
+      }
+      
+      // Continue polling on error unless stopped above
     }
   }
 
   throw new Error('Seedance T2V generation timed out. Please try again.');
 }
 
-// Poll using fetch_result URL
+// Poll using fetch_result URL (NOT USED - GET method not supported)
+// Keeping for reference but this endpoint doesn't support GET requests
 async function pollWithFetchUrl(
   fetchUrl: string,
-  maxAttempts: number = 60
+  maxAttempts: number = 10
 ): Promise<{ videoUrl?: string; requestId?: string; generationTime?: number }> {
   console.log('Polling with fetch_result URL:', fetchUrl);
+  console.warn('Note: This endpoint may not support GET requests');
   
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     // Wait 10 seconds between polls (except first attempt)
@@ -236,8 +281,9 @@ async function pollWithFetchUrl(
 
       // Check for success with video URLs
       if ((response.data.status === 'success' || response.data.status === 'completed') && 
-          (response.data.outputUrls || response.data.output)) {
-        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0];
+          (response.data.outputUrls || response.data.output || response.data.proxy_links || response.data.links)) {
+        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0] || 
+                        response.data.proxy_links?.[0] || response.data.links?.[0];
         if (videoUrl) {
           console.log('Video ready from fetch URL:', videoUrl);
           return {
@@ -255,8 +301,16 @@ async function pollWithFetchUrl(
       // Continue polling if still processing
     } catch (error: any) {
       console.error(`Fetch URL poll error on attempt ${attempt + 1}:`, error.message);
-      if (attempt === maxAttempts - 1) {
-        throw new Error('Request timed out. Please try again.');
+      
+      // If GET method not supported (405), stop immediately
+      if (error.response?.status === 405) {
+        console.error('GET method not supported. Stopping fetch_result polling.');
+        throw new Error('fetch_result endpoint does not support GET method');
+      }
+      
+      // Stop after 3 failed attempts
+      if (attempt >= 2) {
+        throw new Error('fetch_result polling failed. Video may still be processing.');
       }
     }
   }

@@ -131,9 +131,9 @@ const VideoGenerationPage = () => {
               <h3 className="text-xs font-medium text-gray-300">Settings</h3>
               <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
                 <div>480p</div>
-                <div>8 frames</div>
+                <div>25 frames</div>
                 <div>Seedance</div>
-                <div>16 FPS</div>
+                <div>5 FPS (5 sec)</div>
               </div>
             </div>
 
