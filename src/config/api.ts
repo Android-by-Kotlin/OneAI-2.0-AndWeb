@@ -20,7 +20,7 @@ export const API_CONFIG = {
   STABILITY_API_KEY: import.meta.env.VITE_STABILITY_API_KEY || '',
   
   // HeyGen API Key (for live avatars)
-  HEYGEN_API_KEY: import.meta.env.VITE_HEYGEN_API_KEY || '',
+  HEYGEN_API_KEY: import.meta.env.VITE_HEYGEN_API_KEY || 'sk_V2_hgu_kuyqblDYNUX_JL2Wlbk1rqI4Yfws314pi1ffpKr326Bd',
   
   // A4F API Key (for GPT-4o-mini and other models)
   A4F_API_KEY: import.meta.env.VITE_A4F_API_KEY || 'ddc-a4f-2e9bee7f17d640d7bcba8fb26cf48d46',
