@@ -154,8 +154,17 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
-      // Just make the avatar speak - don't echo the text
+      // Make the avatar speak
       await avatarRef.current.speak({ text: userMessage.text });
+      
+      // Add avatar message showing what it's speaking
+      const avatarMessage: Message = {
+        id: `avatar-speaking-${Date.now()}`,
+        text: userMessage.text,
+        sender: 'avatar',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, avatarMessage]);
     } catch (err: any) {
       setError(err.message || 'Failed to send message');
     } finally {
