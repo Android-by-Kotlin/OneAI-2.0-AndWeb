@@ -38,13 +38,9 @@ export async function createStreamingSession(
     }
 
     const response = await axios.post<StreamingSessionResponse>(
-      `${API_ENDPOINTS.HEYGEN_STREAMING}/new`,
+      `${API_ENDPOINTS.HEYGEN_STREAMING}.new`,
       {
         quality: quality,
-        avatar_name: avatarId,
-        voice: {
-          voice_id: 'en-US-Neural2-F',
-        },
       },
       {
         headers: {
@@ -92,7 +88,7 @@ export async function sendAvatarTask(
     }
 
     const response = await axios.post<TaskResponse>(
-      `${API_ENDPOINTS.HEYGEN_STREAMING}/task`,
+      `${API_ENDPOINTS.HEYGEN_STREAMING}.task`,
       {
         session_id: sessionId,
         text: text,
@@ -130,7 +126,7 @@ export async function stopStreamingSession(sessionId: string): Promise<void> {
     }
 
     await axios.post(
-      `${API_ENDPOINTS.HEYGEN_STREAMING}/stop`,
+      `${API_ENDPOINTS.HEYGEN_STREAMING}.stop`,
       {
         session_id: sessionId,
       },

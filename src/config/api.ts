@@ -45,7 +45,7 @@ export const API_ENDPOINTS = {
   OPENROUTER_CHAT: 'https://openrouter.ai/api/v1/chat/completions',
   
   // Live Avatar (using proxy in development to avoid CORS)
-  HEYGEN_STREAMING: import.meta.env.DEV ? '/api/heygen/v1/streaming' : 'https://api.heygen.com/v1/streaming',
+  HEYGEN_STREAMING: import.meta.env.DEV ? '/api/heygen/v2/video/streaming' : 'https://api.heygen.com/v2/video/streaming',
   
   // A4F API
   A4F_CHAT: 'https://api.a4f.co/v1/chat/completions',
