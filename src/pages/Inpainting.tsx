@@ -165,7 +165,14 @@ const SketchToImagePage = () => {
       maskCtx.putImageData(maskImageData, 0, 0);
       const result = await inpaintImage(image, maskCanvas, prompt);
       
+      console.log('Result from inpaintImage:', result);
+      console.log('Image URL type:', typeof result.imageUrl);
+      console.log('Image URL length:', result.imageUrl?.length);
+      console.log('Image URL starts with:', result.imageUrl?.substring(0, 100));
+      
       setGeneratedImage(result.imageUrl);
+      console.log('Generated image state set to:', result.imageUrl?.substring(0, 100));
+      
       if (result.generationTime) {
         setGenerationTime(result.generationTime);
       }
@@ -209,7 +216,17 @@ const SketchToImagePage = () => {
               </div>
             ) : generatedImage ? (
               <div className="relative h-full group">
-                <img src={generatedImage} alt="Result" className="w-full h-full object-contain rounded-xl" />
+                <img 
+                  src={generatedImage} 
+                  alt="Result" 
+                  className="w-full h-full object-contain rounded-xl" 
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    console.error('Image failed to load:', generatedImage);
+                    console.log('Trying to reload...');
+                  }}
+                  onLoad={() => console.log('Image loaded successfully')}
+                />
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => downloadImage(generatedImage, `inpaint-${Date.now()}.png`)} className="p-3 bg-green-600/80 hover:bg-green-600 rounded-full backdrop-blur-sm transition-colors">
                     <Download className="w-5 h-5 text-white" />
