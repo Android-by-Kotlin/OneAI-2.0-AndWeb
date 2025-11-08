@@ -65,7 +65,7 @@ const LiveAvatarPage = () => {
         const text = event.detail?.message || event.detail?.text;
         if (text) {
           const avatarMessage: Message = {
-            id: Date.now().toString(),
+            id: `avatar-${Date.now()}-${Math.random()}`, // Unique ID
             text: text,
             sender: 'avatar',
             timestamp: new Date()
@@ -175,6 +175,21 @@ const LiveAvatarPage = () => {
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
+      videoRef.current.muted = false;
+      // Try to play
+      videoRef.current.play().catch(err => {
+        console.error('Video play error:', err);
+        // If autoplay fails, try with muted first
+        videoRef.current!.muted = true;
+        videoRef.current!.play().then(() => {
+          // Then unmute after playing
+          setTimeout(() => {
+            if (videoRef.current) {
+              videoRef.current.muted = false;
+            }
+          }, 100);
+        });
+      });
     }
   }, [stream]);
 
@@ -256,24 +271,35 @@ const LiveAvatarPage = () => {
             </div>
 
             {/* Video Display */}
-            <div className="flex-1 bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center" style={{ minHeight: '500px' }}>
-              {!isConnected && !isConnecting ? (
-                <div className="text-center text-gray-500">
-                  <VideoIcon className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p>Click Connect to start your avatar session</p>
+            <div className="flex-1 bg-gray-800/50 rounded-lg overflow-hidden relative" style={{ minHeight: '500px' }}>
+              {/* Always render video element */}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted={false}
+                className={`w-full h-full object-contain ${
+                  isConnected ? 'block' : 'hidden'
+                }`}
+              />
+              
+              {/* Loading/Placeholder states */}
+              {!isConnected && !isConnecting && (
+                <div className="absolute inset-0 flex items-center justify-center text-center text-gray-500">
+                  <div>
+                    <VideoIcon className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                    <p>Click Connect to start your avatar session</p>
+                  </div>
                 </div>
-              ) : isConnecting ? (
-                <div className="text-center">
-                  <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-                  <p className="text-gray-400">Connecting to avatar...</p>
+              )}
+              
+              {isConnecting && (
+                <div className="absolute inset-0 flex items-center justify-center text-center">
+                  <div>
+                    <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-gray-400">Connecting to avatar...</p>
+                  </div>
                 </div>
-              ) : (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full h-full object-contain"
-                />
               )}
             </div>
 
