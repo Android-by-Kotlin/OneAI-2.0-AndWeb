@@ -9,7 +9,6 @@ import {
   User2,
   LogOut,
   Sparkles,
-  Film,
   Mic,
   Clapperboard,
 } from 'lucide-react';
@@ -49,15 +48,8 @@ const HomePage = () => {
       route: '/chatbot',
     },
     {
-      title: 'Image to Video',
-      description: 'Animate your static images into dynamic videos',
-      icon: <Film className="w-8 h-8" />,
-      gradient: 'from-yellow-500 to-orange-500',
-      route: '/image-to-video',
-    },
-    {
-      title: 'Text to Video',
-      description: 'Generate videos from text prompts with AI',
+      title: 'Video Generation',
+      description: 'Create videos from text prompts or animate your images',
       icon: <Clapperboard className="w-8 h-8" />,
       gradient: 'from-teal-500 to-cyan-500',
       route: '/text-to-video',
