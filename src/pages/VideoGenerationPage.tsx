@@ -197,13 +197,23 @@ const VideoGenerationPage = () => {
                   )}
                 </div>
               ) : videoUrl ? (
-                <div className="w-full h-full">
+                <div className="w-full h-full relative bg-black">
                   <video
+                    key={videoUrl}
                     src={videoUrl}
                     controls
                     autoPlay
                     loop
+                    playsInline
+                    preload="auto"
                     className="w-full h-full object-contain"
+                    onError={(e) => {
+                      console.error('Video playback error:', e);
+                      setError('Failed to load video. Please try again.');
+                    }}
+                    onLoadedData={() => {
+                      console.log('Video loaded successfully');
+                    }}
                   >
                     Your browser does not support the video tag.
                   </video>
