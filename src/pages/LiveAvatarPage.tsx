@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, Send, Power, Loader2, AlertCircle, Video as VideoIcon } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as VideoIcon } from 'lucide-react';
 import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
 import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
+import { initializeAI, getAIResponse, resetConversation } from '../services/aiChatService';
+import { SpeechRecognitionService } from '../services/speechRecognitionService';
 
 interface Message {
   id: string;
@@ -17,6 +19,7 @@ const LiveAvatarPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const avatarRef = useRef<StreamingAvatar | null>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionService | null>(null);
   
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -27,10 +30,32 @@ const LiveAvatarPage = () => {
   const [connectionState, setConnectionState] = useState<string>('disconnected');
   const [hasApiKey, setHasApiKey] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
 
   // Check if API key is configured
   useEffect(() => {
     setHasApiKey(!!API_CONFIG.HEYGEN_API_KEY);
+  }, []);
+
+  // Initialize AI and Speech Recognition on component mount
+  useEffect(() => {
+    try {
+      initializeAI();
+    } catch (err) {
+      console.error('Failed to initialize AI:', err);
+    }
+
+    // Initialize speech recognition
+    const speechService = new SpeechRecognitionService();
+    speechRecognitionRef.current = speechService;
+    setIsSpeechSupported(speechService.isSupported());
+
+    return () => {
+      if (speechRecognitionRef.current) {
+        speechRecognitionRef.current.destroy();
+      }
+    };
   }, []);
 
   // Start streaming session
@@ -58,21 +83,6 @@ const LiveAvatarPage = () => {
 
       avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
         console.log('Avatar stopped talking');
-      });
-
-      // Use AVATAR_END_MESSAGE to get complete sentences instead of individual characters
-      avatar.on(StreamingEvents.AVATAR_END_MESSAGE, (event) => {
-        console.log('Avatar end message:', event);
-        const text = event.detail?.message || event.detail?.text;
-        if (text && text.trim()) {
-          const avatarMessage: Message = {
-            id: `avatar-${Date.now()}-${Math.random()}`,
-            text: text,
-            sender: 'avatar',
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, avatarMessage]);
-        }
       });
 
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
@@ -136,15 +146,19 @@ const LiveAvatarPage = () => {
     setConnectionState('disconnected');
     setMessages([]);
     setStream(null);
+    
+    // Reset AI conversation
+    resetConversation();
   };
 
-  // Send message to avatar
-  const handleSendMessage = async () => {
-    if (!message.trim() || !avatarRef.current || isSending) return;
+  // Send message to avatar (can be called from text or voice input)
+  const handleSendMessage = async (text?: string) => {
+    const messageText = text || message.trim();
+    if (!messageText || !avatarRef.current || isSending) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message.trim(),
+      text: messageText,
       sender: 'user',
       timestamp: new Date()
     };
@@ -154,21 +168,66 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
-      // Make the avatar speak
-      await avatarRef.current.speak({ text: userMessage.text });
+      // Get AI response
+      const aiResponse = await getAIResponse(messageText);
+      console.log('AI Response:', aiResponse);
+      
+      // Make the avatar speak the AI response
+      await avatarRef.current.speak({ text: aiResponse });
       
       // Add avatar message showing what it's speaking
       const avatarMessage: Message = {
         id: `avatar-speaking-${Date.now()}`,
-        text: userMessage.text,
+        text: aiResponse,
         sender: 'avatar',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, avatarMessage]);
     } catch (err: any) {
+      console.error('Error:', err);
       setError(err.message || 'Failed to send message');
     } finally {
       setIsSending(false);
+    }
+  };
+
+  // Handle voice input
+  const handleVoiceInput = () => {
+    if (!speechRecognitionRef.current || !isConnected) return;
+
+    if (isListening) {
+      // Stop listening
+      speechRecognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      // Start listening
+      setIsListening(true);
+      setError(null);
+      
+      speechRecognitionRef.current.start(
+        // On result
+        (text) => {
+          console.log('Voice input:', text);
+          setIsListening(false);
+          handleSendMessage(text);
+        },
+        // On error
+        (error) => {
+          console.error('Speech recognition error:', error);
+          setIsListening(false);
+          if (error === 'not-allowed') {
+            setError('Microphone access denied. Please allow microphone access.');
+          } else if (error === 'no-speech') {
+            setError('No speech detected. Please try again.');
+          } else {
+            setError(`Voice input error: ${error}`);
+          }
+        },
+        // On end
+        () => {
+          setIsListening(false);
+        }
+      );
     }
   };
 
@@ -375,14 +434,32 @@ const LiveAvatarPage = () => {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Type a message..."
-                disabled={!isConnected || isSending}
+                onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSendMessage()}
+                placeholder={isListening ? "Listening..." : "Type a message..."}
+                disabled={!isConnected || isSending || isListening}
                 className="flex-1 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm disabled:opacity-50"
               />
+              {isSpeechSupported && (
+                <button
+                  onClick={handleVoiceInput}
+                  disabled={!isConnected || isSending}
+                  className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isListening 
+                      ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+                      : 'bg-gray-700 hover:bg-gray-600 text-white'
+                  }`}
+                  title={isListening ? "Stop listening" : "Start voice input"}
+                >
+                  {isListening ? (
+                    <MicOff className="w-5 h-5" />
+                  ) : (
+                    <Mic className="w-5 h-5" />
+                  )}
+                </button>
+              )}
               <button
-                onClick={handleSendMessage}
-                disabled={!isConnected || !message.trim() || isSending}
+                onClick={() => handleSendMessage()}
+                disabled={!isConnected || !message.trim() || isSending || isListening}
                 className="p-2 bg-primary hover:opacity-90 text-white rounded-lg transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSending ? (
