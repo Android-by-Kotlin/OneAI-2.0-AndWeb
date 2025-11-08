@@ -176,36 +176,7 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 glass rounded-2xl p-8"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold gradient-text mb-2">Fast</div>
-              <p className="text-gray-300">Generate images in under 6 seconds</p>
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text mb-2">Multiple Models</div>
-              <p className="text-gray-300">Access to cutting-edge AI models</p>
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text mb-2">High Quality</div>
-              <p className="text-gray-300">Professional-grade outputs</p>
-            </div>
-          </div>
-        </motion.div>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-auto py-8 text-center text-gray-400">
-        <p className="text-sm">
-          OneAI - Made with ❤️ | Transform Ideas into Visual Masterpieces
-        </p>
-      </footer>
     </div>
   );
 };
