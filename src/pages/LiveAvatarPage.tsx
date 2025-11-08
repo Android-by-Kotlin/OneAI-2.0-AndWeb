@@ -60,6 +60,20 @@ const LiveAvatarPage = () => {
         console.log('Avatar stopped talking');
       });
 
+      avatar.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (event) => {
+        console.log('Avatar talking message:', event);
+        const text = event.detail?.message || event.detail?.text;
+        if (text) {
+          const avatarMessage: Message = {
+            id: Date.now().toString(),
+            text: text,
+            sender: 'avatar',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, avatarMessage]);
+        }
+      });
+
       avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
         console.log('Stream disconnected');
         setIsConnected(false);
@@ -73,9 +87,13 @@ const LiveAvatarPage = () => {
         setIsConnecting(false);
         
         // Set video stream
-        if (event.detail && videoRef.current) {
-          videoRef.current.srcObject = event.detail;
-          setStream(event.detail);
+        const mediaStream = event.detail;
+        console.log('MediaStream received:', mediaStream);
+        if (mediaStream && videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          videoRef.current.muted = false;
+          videoRef.current.play().catch((e) => console.error('Play error:', e));
+          setStream(mediaStream);
         }
 
         // Send welcome message
@@ -90,7 +108,7 @@ const LiveAvatarPage = () => {
       // Start avatar session
       await avatar.createStartAvatar({
         quality: AvatarQuality.Low,
-        avatarName: 'default', // You can customize this
+        avatarName: 'Anna_public_3_20240108', // Valid public avatar
         language: 'en',
       });
 
@@ -135,16 +153,8 @@ const LiveAvatarPage = () => {
     setIsSending(true);
 
     try {
+      // Just make the avatar speak - don't echo the text
       await avatarRef.current.speak({ text: userMessage.text });
-      
-      // Add avatar response
-      const avatarMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: userMessage.text,
-        sender: 'avatar',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, avatarMessage]);
     } catch (err: any) {
       setError(err.message || 'Failed to send message');
     } finally {
