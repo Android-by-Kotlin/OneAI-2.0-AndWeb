@@ -78,12 +78,12 @@ const VideoGenerationPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Input Section */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 space-y-6"
+            className="glass rounded-2xl p-6 space-y-4 lg:col-span-1"
           >
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -102,8 +102,8 @@ const VideoGenerationPage = () => {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="A beautiful sunset over mountains..."
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                rows={4}
+                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm"
+                rows={3}
                 disabled={isGenerating}
               />
             </div>
@@ -117,20 +117,20 @@ const VideoGenerationPage = () => {
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
                 placeholder="blurry, low quality, distorted, artifacts..."
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm"
                 rows={2}
                 disabled={isGenerating}
               />
             </div>
 
             {/* Video Settings Info */}
-            <div className="bg-gray-800/30 rounded-lg p-4 space-y-2">
-              <h3 className="text-sm font-medium text-gray-300">Video Settings</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm text-gray-400">
-                <div>Resolution: 480p</div>
-                <div>Frames: 8</div>
-                <div>Model: Seedance T2V</div>
-                <div>FPS: 16</div>
+            <div className="bg-gray-800/30 rounded-lg p-3 space-y-2">
+              <h3 className="text-xs font-medium text-gray-300">Settings</h3>
+              <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
+                <div>480p</div>
+                <div>8 frames</div>
+                <div>Seedance</div>
+                <div>16 FPS</div>
               </div>
             </div>
 
@@ -138,7 +138,7 @@ const VideoGenerationPage = () => {
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full py-3 bg-gradient-to-r from-primary to-purple-600 text-white font-medium rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isGenerating ? (
                 <>
@@ -178,11 +178,11 @@ const VideoGenerationPage = () => {
           <motion.div 
             initial={{ opacity: 0, x: 20 }} 
             animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6"
+            className="glass rounded-2xl p-6 lg:col-span-2"
           >
             <h2 className="text-xl font-bold text-white mb-4">Preview</h2>
             
-            <div className="aspect-video bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="aspect-video bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center" style={{ minHeight: '400px' }}>
               {isGenerating ? (
                 <div className="text-center">
                   <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
