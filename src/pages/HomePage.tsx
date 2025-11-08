@@ -12,6 +12,7 @@ import {
   Sparkles,
   Film,
   Mic,
+  Clapperboard,
 } from 'lucide-react';
 
 interface FeatureCard {
@@ -61,6 +62,13 @@ const HomePage = () => {
       icon: <Film className="w-8 h-8" />,
       gradient: 'from-yellow-500 to-orange-500',
       route: '/image-to-video',
+    },
+    {
+      title: 'Text to Video',
+      description: 'Generate videos from text prompts with AI',
+      icon: <Clapperboard className="w-8 h-8" />,
+      gradient: 'from-teal-500 to-cyan-500',
+      route: '/text-to-video',
     },
     {
       title: 'Inpainting',

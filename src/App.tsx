@@ -9,6 +9,7 @@ import ImageToImagePage from './pages/ImageToImagePage';
 import ChatBotPage from './pages/ChatBotPage';
 import VideoGenerationPage from './pages/VideoGenerationPage';
 import ImageToVideoPage from './pages/ImageToVideoPage';
+import TextToVideoPage from './pages/TextToVideoPage';
 import SketchToImagePage from './pages/Inpainting';
 import LiveAvatarPage from './pages/LiveAvatarPage';
 
@@ -86,6 +87,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ImageToVideoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/text-to-video"
+          element={
+            <ProtectedRoute>
+              <TextToVideoPage />
             </ProtectedRoute>
           }
         />
