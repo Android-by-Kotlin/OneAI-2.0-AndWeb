@@ -6,9 +6,14 @@ interface VideoGenerationRequest {
   model_id: string;
   prompt: string;
   negative_prompt?: string;
-  height: number;
-  width: number;
-  frames: number;
+  aspect_ratio: string;
+  resolution: string;
+  camera_fixed?: string | null;
+  num_frames: string;
+  num_inference_steps: string;
+  guidance_scale: string;
+  fps: string;
+  seed?: string | null;
   webhook?: string | null;
   track_id?: string | null;
 }
@@ -16,10 +21,13 @@ interface VideoGenerationRequest {
 interface VideoGenerationResponse {
   status: string;
   generationTime?: number;
-  id?: string;
+  id?: number | string;
   output?: string[];
+  outputUrls?: string[];
   proxy_links?: string[];
   links?: string[];
+  fetch_result?: string;
+  eta?: number;
   error?: string;
   message?: string;
   meta?: any;
@@ -30,30 +38,32 @@ interface VideoPollRequest {
   request_id: string;
 }
 
-// Generate video using CogVideoX model
+// Generate video using Seedance T2V model
 export async function generateVideo(
   prompt: string,
-  negativePrompt: string = 'low quality, worst quality, deformed, distorted',
-  width: number = 720,
-  height: number = 480,
-  frames: number = 49
+  negativePrompt: string = 'blurry, low quality, distorted, artifacts, bad anatomy'
 ): Promise<{ videoUrl?: string; requestId?: string; generationTime?: number }> {
   try {
-    console.log('Starting CogVideoX video generation...');
+    console.log('Starting Seedance T2V video generation...');
     
     const requestBody: VideoGenerationRequest = {
       key: API_CONFIG.MODELSLAB_API_KEY,
-      model_id: 'cogvideox',
+      model_id: 'seedance-t2v',
       prompt: prompt,
       negative_prompt: negativePrompt,
-      height: height,
-      width: width,
-      frames: frames,
+      aspect_ratio: '16:9',
+      resolution: '480p',
+      camera_fixed: null,
+      num_frames: '8',
+      num_inference_steps: '20',
+      guidance_scale: '7.0',
+      fps: '16',
+      seed: null,
       webhook: null,
       track_id: null
     };
 
-    console.log('Sending request to API...', requestBody);
+    console.log('Sending Seedance T2V request to API...', requestBody);
 
     const response = await axios.post<VideoGenerationResponse>(
       'https://modelslab.com/api/v6/video/text2video',
@@ -66,52 +76,52 @@ export async function generateVideo(
       }
     );
 
-    console.log('Video generation response:', response.data);
+    console.log('Seedance T2V response:', response.data);
 
-    if (response.data.status === 'success') {
-      // Check for proxy_links first (stable CDN URLs)
-      if (response.data.proxy_links && response.data.proxy_links.length > 0) {
-        const videoUrl = response.data.proxy_links[0];
-        console.log('Video URL from proxy_links:', videoUrl);
-        return {
-          videoUrl: videoUrl,
-          generationTime: response.data.generationTime
-        };
-      }
-      // Fallback to output
-      else if (response.data.output && response.data.output.length > 0) {
-        const videoUrl = response.data.output[0];
-        console.log('Video URL from output:', videoUrl);
-        return {
-          videoUrl: videoUrl,
-          generationTime: response.data.generationTime
-        };
-      }
-      // Fallback to links
-      else if (response.data.links && response.data.links.length > 0) {
-        const videoUrl = response.data.links[0];
-        console.log('Video URL from links:', videoUrl);
-        return {
-          videoUrl: videoUrl,
-          generationTime: response.data.generationTime
-        };
-      } else {
-        throw new Error('No video URL in response');
-      }
-    } else if (response.data.status === 'processing') {
-      // Video is processing, need to poll
-      if (response.data.id) {
-        console.log('Video is processing, request ID:', response.data.id);
-        return {
-          requestId: response.data.id
-        };
-      }
-      throw new Error('Video is processing but no request ID provided');
-    } else {
-      const errorMsg = response.data.error || response.data.message || 'Unknown error';
-      console.error('API returned error:', errorMsg, response.data);
-      throw new Error(errorMsg);
+    // Check for immediate success with video URL
+    if (response.data.outputUrls && response.data.outputUrls.length > 0) {
+      const videoUrl = response.data.outputUrls[0];
+      console.log('Seedance T2V video ready immediately:', videoUrl);
+      return {
+        videoUrl: videoUrl,
+        generationTime: response.data.generationTime
+      };
     }
+    
+    // Check for output field (alternative response format)
+    if (response.data.output && response.data.output.length > 0) {
+      const videoUrl = response.data.output[0];
+      console.log('Seedance T2V video from output:', videoUrl);
+      return {
+        videoUrl: videoUrl,
+        generationTime: response.data.generationTime
+      };
+    }
+    
+    // Check if we have a fetch_result URL to poll
+    if (response.data.fetch_result) {
+      console.log('Seedance T2V has fetch_result URL:', response.data.fetch_result);
+      // Need to poll using fetch_result endpoint
+      return await pollWithFetchUrl(response.data.fetch_result);
+    }
+    
+    // Check for request ID to poll
+    if (response.data.id && (response.data.status === 'processing' || response.data.status === 'pending')) {
+      console.log('Seedance T2V is processing, request ID:', response.data.id);
+      return {
+        requestId: String(response.data.id)
+      };
+    }
+    
+    // If status indicates processing but no polling mechanism available
+    if (response.data.status === 'processing' || response.data.status === 'pending') {
+      throw new Error('Video is processing. Please try again later.');
+    }
+    
+    // Error case
+    const errorMsg = response.data.error || response.data.message || response.data.status || 'No video URL returned';
+    console.error('Seedance T2V unexpected response:', errorMsg);
+    throw new Error(errorMsg);
   } catch (error: any) {
     console.error('Full video generation error:', {
       message: error.message,
@@ -142,23 +152,25 @@ export async function generateVideo(
   }
 }
 
-// Poll for video generation results
+// Poll for video generation results using fetch endpoint
 export async function pollForVideo(
   requestId: string,
-  maxAttempts: number = 40
+  maxAttempts: number = 60
 ): Promise<{ videoUrl: string; generationTime?: number }> {
-  console.log('Starting polling for request:', requestId);
+  console.log('Starting Seedance T2V polling for request:', requestId);
   
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+    // Wait 10 seconds between polls (except first attempt)
+    if (attempt > 0) {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
 
     try {
       const response = await axios.post<VideoGenerationResponse>(
-        'https://modelslab.com/api/v6/video/fetch',
+        `https://modelslab.com/api/v6/video/fetch/${requestId}`,
         {
-          key: API_CONFIG.MODELSLAB_API_KEY,
-          request_id: requestId
-        } as VideoPollRequest,
+          key: API_CONFIG.MODELSLAB_API_KEY
+        },
         {
           headers: {
             'Content-Type': 'application/json'
@@ -166,40 +178,86 @@ export async function pollForVideo(
         }
       );
 
-      console.log(`Poll attempt ${attempt + 1}:`, response.data.status);
+      console.log(`Seedance T2V poll attempt ${attempt + 1}/${maxAttempts}:`, response.data.status);
 
-      if (response.data.status === 'success') {
-        // Prefer proxy_links for stable CDN URLs
-        if (response.data.proxy_links && response.data.proxy_links.length > 0) {
+      // Check for success with video URLs
+      if ((response.data.status === 'success' || response.data.status === 'completed') && 
+          (response.data.outputUrls || response.data.output)) {
+        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0];
+        if (videoUrl) {
+          console.log('Seedance T2V video ready:', videoUrl);
           return {
-            videoUrl: response.data.proxy_links[0],
+            videoUrl: videoUrl,
             generationTime: response.data.generationTime
           };
         }
-        // Fallback to output
-        else if (response.data.output && response.data.output.length > 0) {
-          return {
-            videoUrl: response.data.output[0],
-            generationTime: response.data.generationTime
-          };
-        }
-        // Fallback to links
-        else if (response.data.links && response.data.links.length > 0) {
-          return {
-            videoUrl: response.data.links[0],
-            generationTime: response.data.generationTime
-          };
-        }
-      } else if (response.data.status === 'error' || response.data.status === 'failed') {
+      }
+      
+      // Check for failure
+      if (response.data.status === 'error' || response.data.status === 'failed') {
         throw new Error(response.data.error || response.data.message || 'Video generation failed');
       }
+      
+      // Log ETA if available
+      if (response.data.eta) {
+        console.log(`Seedance T2V ETA: ${response.data.eta}s`);
+      }
+      
       // Continue polling if still processing
     } catch (error: any) {
-      console.error(`Poll error on attempt ${attempt + 1}:`, error.message);
+      console.error(`Seedance T2V poll error on attempt ${attempt + 1}:`, error.message);
       if (attempt === maxAttempts - 1) {
         throw new Error('Request timed out. Please try again.');
       }
       // Continue polling on error unless it's the last attempt
+    }
+  }
+
+  throw new Error('Seedance T2V generation timed out. Please try again.');
+}
+
+// Poll using fetch_result URL
+async function pollWithFetchUrl(
+  fetchUrl: string,
+  maxAttempts: number = 60
+): Promise<{ videoUrl?: string; requestId?: string; generationTime?: number }> {
+  console.log('Polling with fetch_result URL:', fetchUrl);
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Wait 10 seconds between polls (except first attempt)
+    if (attempt > 0) {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
+
+    try {
+      const response = await axios.get<VideoGenerationResponse>(fetchUrl);
+      
+      console.log(`Fetch URL poll attempt ${attempt + 1}/${maxAttempts}:`, response.data.status);
+
+      // Check for success with video URLs
+      if ((response.data.status === 'success' || response.data.status === 'completed') && 
+          (response.data.outputUrls || response.data.output)) {
+        const videoUrl = response.data.outputUrls?.[0] || response.data.output?.[0];
+        if (videoUrl) {
+          console.log('Video ready from fetch URL:', videoUrl);
+          return {
+            videoUrl: videoUrl,
+            generationTime: response.data.generationTime
+          };
+        }
+      }
+      
+      // Check for failure
+      if (response.data.status === 'error' || response.data.status === 'failed') {
+        throw new Error(response.data.error || response.data.message || 'Video generation failed');
+      }
+      
+      // Continue polling if still processing
+    } catch (error: any) {
+      console.error(`Fetch URL poll error on attempt ${attempt + 1}:`, error.message);
+      if (attempt === maxAttempts - 1) {
+        throw new Error('Request timed out. Please try again.');
+      }
     }
   }
 

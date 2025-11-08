@@ -7,7 +7,7 @@ import { generateVideo, pollForVideo } from '../services/videoGenerationService'
 const VideoGenerationPage = () => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
-  const [negativePrompt, setNegativePrompt] = useState('low quality, worst quality, deformed, distorted');
+  const [negativePrompt, setNegativePrompt] = useState('blurry, low quality, distorted, artifacts, bad anatomy');
   const [isGenerating, setIsGenerating] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +90,7 @@ const VideoGenerationPage = () => {
                 <Video className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-white">Create Video</h2>
               </div>
-              <p className="text-gray-400 text-sm">Using CogVideoX Model</p>
+              <p className="text-gray-400 text-sm">Using Seedance T2V Model</p>
             </div>
 
             {/* Prompt Input */}
@@ -116,7 +116,7 @@ const VideoGenerationPage = () => {
               <textarea
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="Things to avoid in the video..."
+                placeholder="blurry, low quality, distorted, artifacts..."
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                 rows={2}
                 disabled={isGenerating}
@@ -127,10 +127,10 @@ const VideoGenerationPage = () => {
             <div className="bg-gray-800/30 rounded-lg p-4 space-y-2">
               <h3 className="text-sm font-medium text-gray-300">Video Settings</h3>
               <div className="grid grid-cols-2 gap-2 text-sm text-gray-400">
-                <div>Resolution: 720x480</div>
-                <div>Frames: 49</div>
-                <div>Model: CogVideoX</div>
-                <div>Duration: ~3 sec</div>
+                <div>Resolution: 480p</div>
+                <div>Frames: 8</div>
+                <div>Model: Seedance T2V</div>
+                <div>FPS: 16</div>
               </div>
             </div>
 
