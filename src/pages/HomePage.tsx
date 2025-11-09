@@ -362,29 +362,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer CTA */}
-      <section className="py-24 px-6 lg:px-12">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h3 className="text-5xl sm:text-6xl font-light text-white mb-8">
-              Ready to create?
-            </h3>
-            <button
-              onClick={() => navigate('/chatbot')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-200 transition-colors"
-            >
-              Get started
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </motion.div>
-        </div>
-      </section>
     </div>
   );
 };
