@@ -69,6 +69,14 @@ const ChatBotPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  }, [inputText]);
+
   // Load chat history once on mount
   useEffect(() => {
     if (user?.uid) {
@@ -579,51 +587,77 @@ const ChatBotPage = () => {
               </button>
             </div>
           )}
-          <div className="flex gap-2 items-end">
-            <div className="flex-1 glass rounded-2xl">
-              <textarea
-                ref={inputRef}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={selectedImage ? "Ask about this image..." : "Type your message..."}
-                className="w-full px-4 py-3 bg-transparent text-white placeholder-gray-400 focus:outline-none resize-none"
-                rows={1}
-                style={{
-                  minHeight: '44px',
-                  maxHeight: '120px',
-                  height: 'auto'
-                }}
-              />
-            </div>
-            {/* Image Upload Button - Only show for Gemini models */}
-            {selectedModel.includes('gemini') && (
-              <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
-                  className="px-4 py-3 glass hover:bg-white/10 text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Upload image"
+          
+          {/* Integrated Input Box */}
+          <div className="glass rounded-2xl p-3 flex flex-col gap-3">
+            {/* Textarea */}
+            <textarea
+              ref={inputRef}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={selectedImage ? "Ask about this image..." : "Type your message..."}
+              className="w-full px-2 bg-transparent text-white placeholder-gray-400 focus:outline-none resize-none"
+              rows={1}
+              style={{
+                minHeight: '24px',
+                maxHeight: '200px',
+                height: 'auto',
+                overflow: 'auto'
+              }}
+            />
+            
+            {/* Bottom Bar with Model Selector and Actions */}
+            <div className="flex items-center justify-between gap-3">
+              {/* Model Selector */}
+              <div className="flex items-center gap-2">
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-white text-sm rounded-lg border border-primary/40 focus:outline-none focus:border-primary transition-colors cursor-pointer"
                 >
-                  <ImageIcon className="w-5 h-5" />
+                  {AVAILABLE_MODELS.map(model => (
+                    <option key={model.id} value={model.id} className="bg-gray-900 text-white">
+                      {model.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                {/* Image Upload Button - Only show for Gemini models */}
+                {selectedModel.includes('gemini') && (
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isLoading}
+                      className="p-2 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Upload image"
+                    >
+                      <ImageIcon className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+                
+                {/* Send Button */}
+                <button
+                  onClick={handleSend}
+                  disabled={(!inputText.trim() && !selectedImage) || isLoading}
+                  className="p-2 bg-primary hover:bg-primary/80 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Send message"
+                >
+                  <Send className="w-5 h-5" />
                 </button>
-              </>
-            )}
-            <button
-              onClick={handleSend}
-              disabled={(!inputText.trim() && !selectedImage) || isLoading}
-              className="px-6 py-3 glass hover:bg-white/10 text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              <Send className="w-5 h-5" />
-              <span className="hidden sm:inline">Send</span>
-            </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
