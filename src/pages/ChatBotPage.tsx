@@ -67,12 +67,13 @@ const ChatBotPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Load chat history on mount
+  // Load chat history once on mount
   useEffect(() => {
     if (user?.uid) {
       loadChatHistory();
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid]);
 
   const loadChatHistory = async () => {
     if (!user?.uid) return;
@@ -185,14 +186,29 @@ const ChatBotPage = () => {
         if (currentSessionId) {
           // Update existing session
           await updateChatSession(user.uid, currentSessionId, finalMessages);
+          // Update local state without reloading
+          setChatSessions(prev => 
+            prev.map(session => 
+              session.id === currentSessionId 
+                ? { ...session, messages: finalMessages, updatedAt: Date.now() }
+                : session
+            )
+          );
         } else {
           // Create new session
           const title = generateChatTitle(userMessage.content);
           const newSessionId = await createChatSession(user.uid, title, selectedModel);
           setCurrentSessionId(newSessionId);
           await updateChatSession(user.uid, newSessionId, finalMessages);
-          // Reload history to show new chat
-          loadChatHistory();
+          // Add to local state without reloading from Firebase
+          setChatSessions(prev => [{
+            id: newSessionId,
+            title,
+            model: selectedModel,
+            messages: finalMessages,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }, ...prev]);
         }
       } catch (saveError: any) {
         console.error('Failed to save chat history:', saveError);
