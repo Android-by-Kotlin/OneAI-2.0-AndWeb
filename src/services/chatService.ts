@@ -8,6 +8,7 @@ export interface Message {
   content: string;
   timestamp: number;
   model?: string;
+  image?: string; // Base64 image data or URL
 }
 
 export interface ChatModel {
@@ -113,12 +114,37 @@ function cleanResponseText(text: string): string {
 async function sendToGemini(
   message: string,
   modelId: string,
-  conversationHistory: Message[] = []
+  conversationHistory: Message[] = [],
+  imageData?: string
 ): Promise<string> {
   try {
     const model = genAI.getGenerativeModel({ model: modelId });
     
-    // Build conversation history for context
+    // If there's an image, use a simpler approach with inline data
+    if (imageData) {
+      // Extract base64 data if it includes the data:image prefix
+      const base64Data = imageData.includes('base64,') 
+        ? imageData.split('base64,')[1] 
+        : imageData;
+      
+      const imageParts = [
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: "image/jpeg"
+          }
+        },
+        { text: message }
+      ];
+      
+      const result = await model.generateContent(imageParts);
+      const response = await result.response;
+      const text = response.text();
+      
+      return cleanResponseText(text);
+    }
+    
+    // Build conversation history for context (text-only)
     const history = conversationHistory.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.content }]
@@ -285,7 +311,8 @@ async function sendToA4F(
 export async function sendMessage(
   message: string,
   modelId: string,
-  conversationHistory: Message[] = []
+  conversationHistory: Message[] = [],
+  imageData?: string
 ): Promise<string> {
   const model = AVAILABLE_MODELS.find(m => m.id === modelId);
   
@@ -294,10 +321,16 @@ export async function sendMessage(
   }
 
   if (model.provider === 'google') {
-    return sendToGemini(message, modelId, conversationHistory);
+    return sendToGemini(message, modelId, conversationHistory, imageData);
   } else if (model.provider === 'openrouter') {
+    if (imageData) {
+      throw new Error('Image upload is only supported with Gemini models');
+    }
     return sendToOpenRouter(message, modelId, conversationHistory);
   } else if (model.provider === 'a4f') {
+    if (imageData) {
+      throw new Error('Image upload is only supported with Gemini models');
+    }
     return sendToA4F(message, modelId, conversationHistory);
   }
   

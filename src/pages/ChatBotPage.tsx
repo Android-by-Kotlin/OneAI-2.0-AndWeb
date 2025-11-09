@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, Loader, Trash2, Settings } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Trash2, Settings, Image as ImageIcon, X } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
 
 // Typing effect component
@@ -35,8 +35,10 @@ const ChatBotPage = () => {
   const [selectedModel, setSelectedModel] = useState('models/gemini-2.0-flash');
   const [showSettings, setShowSettings] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -51,24 +53,48 @@ const ChatBotPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSend = async () => {
-    if (!inputText.trim() || isLoading) return;
+    if ((!inputText.trim() && !selectedImage) || isLoading) return;
 
     const userMessage: Message = {
       id: generateMessageId(),
       role: 'user',
-      content: inputText.trim(),
+      content: inputText.trim() || 'Describe this image',
       timestamp: Date.now(),
-      model: selectedModel
+      model: selectedModel,
+      image: selectedImage || undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentImage = selectedImage;
     setInputText('');
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await sendMessage(userMessage.content, selectedModel, messages);
+      const response = await sendMessage(userMessage.content, selectedModel, messages, currentImage || undefined);
       
       const assistantMessage: Message = {
         id: generateMessageId(),
@@ -210,6 +236,15 @@ const ChatBotPage = () => {
                     : 'glass text-white'
                 }`}
               >
+                {message.image && (
+                  <div className="mb-2">
+                    <img 
+                      src={message.image} 
+                      alt="Uploaded" 
+                      className="max-w-full max-h-48 rounded-lg"
+                    />
+                  </div>
+                )}
                 <div className="whitespace-pre-wrap break-words">
                   {message.role === 'assistant' && typingMessageId === message.id ? (
                     <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
@@ -254,6 +289,22 @@ const ChatBotPage = () => {
       {/* Input Area */}
       <div className="glass-dark border-t border-white border-opacity-10 p-4">
         <div className="max-w-5xl mx-auto">
+          {/* Image Preview */}
+          {selectedImage && (
+            <div className="mb-3 relative inline-block">
+              <img 
+                src={selectedImage} 
+                alt="Preview" 
+                className="max-h-32 rounded-lg"
+              />
+              <button
+                onClick={removeImage}
+                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
             <div className="flex-1 glass rounded-2xl">
               <textarea
@@ -261,7 +312,7 @@ const ChatBotPage = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
+                placeholder={selectedImage ? "Ask about this image..." : "Type your message..."}
                 className="w-full px-4 py-3 bg-transparent text-white placeholder-gray-400 focus:outline-none resize-none"
                 rows={1}
                 style={{
@@ -271,9 +322,29 @@ const ChatBotPage = () => {
                 }}
               />
             </div>
+            {/* Image Upload Button - Only show for Gemini models */}
+            {selectedModel.includes('gemini') && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  className="px-4 py-3 glass hover:bg-white/10 text-white rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Upload image"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                </button>
+              </>
+            )}
             <button
               onClick={handleSend}
-              disabled={!inputText.trim() || isLoading}
+              disabled={(!inputText.trim() && !selectedImage) || isLoading}
               className="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Send className="w-5 h-5" />
