@@ -190,9 +190,74 @@ const SketchToImagePage = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 overflow-hidden flex flex-col">
+    <div className="h-screen bg-black relative overflow-hidden flex flex-col">
+      {/* Ambient gradient background - indigo/purple theme */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Vignette overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%)'
+        }} />
+        
+        {/* Bottom ambient vignette */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '60%',
+          background: `radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.35) 0%, rgba(168, 85, 247, 0.25) 40%, transparent 70%)`,
+          opacity: 1
+        }} />
+        
+        {/* Left side glow */}
+        <div style={{
+          position: 'absolute',
+          left: 0,
+          top: '20%',
+          width: '50%',
+          height: '60%',
+          background: `radial-gradient(ellipse at left, rgba(99, 102, 241, 0.3) 0%, transparent 60%)`,
+          opacity: 1
+        }} />
+        
+        {/* Right side glow */}
+        <div style={{
+          position: 'absolute',
+          right: 0,
+          top: '30%',
+          width: '50%',
+          height: '60%',
+          background: `radial-gradient(ellipse at right, rgba(168, 85, 247, 0.25) 0%, transparent 60%)`,
+          opacity: 1
+        }} />
+        
+        {/* Top subtle glow */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '20%',
+          right: '20%',
+          height: '40%',
+          background: `radial-gradient(ellipse at top, rgba(79, 70, 229, 0.2) 0%, transparent 60%)`,
+          opacity: 1
+        }} />
+        
+        {/* Center depth */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70%',
+          height: '70%',
+          background: `radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)`,
+          opacity: 1
+        }} />
+      </div>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
+      <div className="flex items-center justify-between p-4 flex-shrink-0 relative z-10">
         <button onClick={() => navigate('/home')} className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
           <ArrowLeft className="w-5 h-5" />Back
         </button>
@@ -201,7 +266,7 @@ const SketchToImagePage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 pt-0 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 pt-0 overflow-hidden relative z-10">
         {/* Left Side - Result */}
         <div className="flex flex-col gap-3 min-h-0">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="glass rounded-2xl p-2 flex-1 relative overflow-hidden">
