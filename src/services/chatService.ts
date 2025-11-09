@@ -99,13 +99,33 @@ export const AVAILABLE_MODELS: ChatModel[] = [
 const genAI = new GoogleGenerativeAI(API_CONFIG.GEMINI_API_KEY);
 
 /**
- * Clean response text by removing thinking tags
+ * Clean response text by removing thinking tags and normalizing formatting
  */
 function cleanResponseText(text: string): string {
-  return text
+  if (!text) return 'Processing your request...';
+  
+  // Remove thinking tags but preserve markdown formatting
+  let cleaned = text
     .replace(/<think>.*?<\/think>/gis, '')
     .replace(/<thinking>.*?<\/thinking>/gis, '')
-    .trim() || 'Processing your request...';
+    .trim();
+  
+  // If the text is empty after cleaning, return a default message
+  if (!cleaned) return 'Processing your request...';
+  
+  // Convert escaped newlines to actual newlines (fix for a4f models)
+  // This handles cases where \n is sent as literal string instead of newline character
+  cleaned = cleaned.replace(/\\n/g, '\n');
+  
+  // Also handle other common escape sequences that might be literal
+  cleaned = cleaned.replace(/\\t/g, '\t');
+  cleaned = cleaned.replace(/\\r/g, '');
+  
+  // Preserve double line breaks for markdown paragraph separation
+  // But normalize excessive line breaks
+  cleaned = cleaned.replace(/\n{4,}/g, '\n\n\n');
+  
+  return cleaned;
 }
 
 /**
@@ -221,7 +241,9 @@ async function sendToOpenRouter(
     );
 
     if (response.data?.choices?.[0]?.message?.content) {
-      return cleanResponseText(response.data.choices[0].message.content);
+      const content = response.data.choices[0].message.content;
+      console.log('OpenRouter raw response (first 200 chars):', content.substring(0, 200));
+      return cleanResponseText(content);
     }
     
     throw new Error('Invalid response from OpenRouter');
@@ -284,7 +306,13 @@ async function sendToA4F(
     );
 
     if (response.data?.choices?.[0]?.message?.content) {
-      return cleanResponseText(response.data.choices[0].message.content);
+      const content = response.data.choices[0].message.content;
+      // Log for debugging
+      console.log('A4F raw response (first 200 chars):', content.substring(0, 200));
+      console.log('Contains escaped newlines:', content.includes('\\n'));
+      const cleaned = cleanResponseText(content);
+      console.log('A4F cleaned response (first 200 chars):', cleaned.substring(0, 200));
+      return cleaned;
     }
     
     throw new Error('Invalid response from A4F');
