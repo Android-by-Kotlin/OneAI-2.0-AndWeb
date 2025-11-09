@@ -504,11 +504,7 @@ const ChatBotPage = () => {
               }`}
             >
               <div
-                className={`max-w-[85%] rounded-2xl px-5 py-4 ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-primary to-accent text-white'
-                    : 'glass-dark border border-white/10'
-                }`}
+                className="max-w-[85%] rounded-2xl px-5 py-4 glass-dark border border-white/10"
               >
                 {message.image && (
                   <div className="mb-3 rounded-lg overflow-hidden">
