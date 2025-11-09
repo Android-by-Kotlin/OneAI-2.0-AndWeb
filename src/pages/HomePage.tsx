@@ -202,7 +202,7 @@ const HomePage = () => {
                         <div className="absolute inset-0">
                           {/* Showcase Image */}
                           <img
-                            src="https://drive.google.com/uc?export=view&id=1WXyBE-yigEiXK9pN_ENzexJ8G-f5yTcy"
+                            src="https://prior-crimson-as5dvgjrrf.edgeone.app/text%20to%20image.png"
                             alt="AI Generated Image Example"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
