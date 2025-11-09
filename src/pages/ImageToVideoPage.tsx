@@ -17,9 +17,40 @@ const ImageToVideoPage = () => {
   const [isPortrait, setIsPortrait] = useState(true);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload a valid image file');
+      return;
+    }
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image file size must be less than 10MB');
+      return;
+    }
+
+    setUploadedFile(file);
+    
+    // Convert to base64 for preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setUploadedFile(null);
+    setImageUrl('');
+  };
+
   const handleGenerate = async () => {
     if (!imageUrl.trim()) {
-      setError('Please enter an image URL');
+      setError('Please upload an image or enter an image URL');
       return;
     }
 
@@ -113,34 +144,56 @@ const ImageToVideoPage = () => {
               </label>
             </div>
 
-            {/* Image URL Input */}
+            {/* Reference Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Image URL *
+                Reference Image *
               </label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                disabled={isGenerating}
-              />
+              
+              {!imageUrl ? (
+                <label className="w-full flex flex-col items-center justify-center h-40 px-4 py-6 bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-800/70 hover:border-primary/50 transition-all">
+                  <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
+                  <span className="text-sm text-gray-400 text-center">Click to upload image</span>
+                  <span className="text-xs text-gray-500 mt-1">or enter URL below</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={isGenerating}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <div className="relative bg-gray-800/50 rounded-lg overflow-hidden" style={{ height: '200px' }}>
+                  <img 
+                    src={imageUrl} 
+                    alt="Reference" 
+                    className="w-full h-full object-contain"
+                  />
+                  <button
+                    onClick={handleRemoveImage}
+                    disabled={isGenerating}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 rounded-full transition-colors disabled:opacity-50"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              )}
+              
+              {/* Alternative: Enter URL */}
+              {!imageUrl && (
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="Or paste image URL here"
+                    className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                    disabled={isGenerating}
+                  />
+                </div>
+              )}
             </div>
-
-            {/* Image Preview */}
-            {imageUrl && (
-              <div className="relative bg-gray-800/50 rounded-lg" style={{ height: '200px' }}>
-                <img 
-                  src={imageUrl} 
-                  alt="Input" 
-                  className="w-full h-full object-contain rounded-lg"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-            )}
 
             {/* Prompt Input */}
             <div>
