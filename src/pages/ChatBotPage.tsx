@@ -12,6 +12,7 @@ import {
   type ChatSession 
 } from '../services/chatHistoryService';
 import { useAuth } from '../contexts/AuthContext';
+import MessageContent from '../components/MessageContent';
 
 // Typing effect component
 const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
@@ -502,29 +503,37 @@ const ChatBotPage = () => {
               }`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[85%] rounded-2xl px-5 py-4 ${
                   message.role === 'user'
                     ? 'bg-gradient-to-r from-primary to-accent text-white'
-                    : 'glass text-white'
+                    : 'glass-dark border border-white/10'
                 }`}
               >
                 {message.image && (
-                  <div className="mb-2">
+                  <div className="mb-3 rounded-lg overflow-hidden">
                     <img 
                       src={message.image} 
                       alt="Uploaded" 
-                      className="max-w-full max-h-48 rounded-lg"
+                      className="max-w-full max-h-56 rounded-lg"
                     />
                   </div>
                 )}
-                <div className="whitespace-pre-wrap break-words">
-                  {message.role === 'assistant' && typingMessageId === message.id ? (
-                    <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
-                  ) : (
-                    message.content
-                  )}
-                </div>
-                <div className="text-xs opacity-60 mt-2">
+                {message.role === 'user' ? (
+                  <div className="whitespace-pre-wrap break-words text-white leading-7">
+                    {message.content}
+                  </div>
+                ) : (
+                  <>
+                    {typingMessageId === message.id ? (
+                      <div className="text-gray-300 leading-7">
+                        <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
+                      </div>
+                    ) : (
+                      <MessageContent content={message.content} />
+                    )}
+                  </>
+                )}
+                <div className="text-xs opacity-50 mt-3 text-gray-400">
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </div>
               </div>
