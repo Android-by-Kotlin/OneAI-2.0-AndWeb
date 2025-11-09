@@ -281,7 +281,40 @@ const ChatBotPage = () => {
   const groupedChats = groupChatsByDate(chatSessions);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex">
+    <div className="min-h-screen bg-black flex relative">
+      {/* Ambient Light Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black opacity-60" />
+        
+        {/* Bottom Vignette - Green/Emerald glow */}
+        <div className="absolute inset-0 blur-3xl" style={{
+          background: 'radial-gradient(ellipse at 50% 120%, rgba(34, 197, 94, 0.35) 0%, rgba(22, 163, 74, 0.2) 30%, transparent 70%)'
+        }} />
+        
+        {/* Left Side Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-60" style={{
+          background: 'radial-gradient(ellipse at 0% 50%, rgba(34, 197, 94, 0.35) 0%, transparent 60%)'
+        }} />
+        
+        {/* Right Side Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-60" style={{
+          background: 'radial-gradient(ellipse at 100% 50%, rgba(16, 185, 129, 0.25) 0%, transparent 60%)'
+        }} />
+        
+        {/* Top Subtle Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-40" style={{
+          background: 'radial-gradient(ellipse at 50% -20%, rgba(22, 163, 74, 0.2) 0%, transparent 50%)'
+        }} />
+        
+        {/* Center Depth Layer */}
+        <div className="absolute inset-0 blur-3xl opacity-30" style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(22, 163, 74, 0.2) 0%, transparent 70%)'
+        }} />
+      </div>
+      
+      {/* Content with proper z-index */}
+      <div className="relative z-10 flex w-full">
       {/* Sidebar */}
       <AnimatePresence>
         {showHistory && (
@@ -591,6 +624,7 @@ const ChatBotPage = () => {
             </button>
           </div>
         </div>
+      </div>
       </div>
       </div>
     </div>
