@@ -20,7 +20,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
   };
 
   return (
-    <div className="prose prose-invert prose-sm max-w-none">
+    <div className="prose prose-invert prose-sm max-w-none break-words">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight, rehypeRaw]}
@@ -76,7 +76,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
           },
           // Custom paragraph rendering
           p({ children }) {
-            return <p className="mb-3 leading-7 text-gray-100">{children}</p>;
+            return <p className="mb-3 leading-7 text-gray-100 break-words">{children}</p>;
           },
           // Custom heading rendering
           h1({ children }) {
@@ -90,13 +90,13 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
           },
           // Custom list rendering
           ul({ children }) {
-            return <ul className="list-disc list-inside mb-3 space-y-1 text-gray-100">{children}</ul>;
+            return <ul className="list-disc list-inside mb-3 space-y-1.5 text-gray-100 ml-4">{children}</ul>;
           },
           ol({ children }) {
-            return <ol className="list-decimal list-inside mb-3 space-y-1 text-gray-100">{children}</ol>;
+            return <ol className="list-decimal list-inside mb-3 space-y-1.5 text-gray-100 ml-4">{children}</ol>;
           },
           li({ children }) {
-            return <li className="leading-7">{children}</li>;
+            return <li className="leading-7 break-words">{children}</li>;
           },
           // Custom blockquote rendering
           blockquote({ children }) {
