@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import MessageContent from '../components/MessageContent';
 
 // Typing effect component with live formatting
-const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
+const TypingText = ({ text, speed = 1, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -220,7 +220,7 @@ const ChatBotPage = () => {
       // Clear typing effect after animation completes
       setTimeout(() => {
         setTypingMessageId(null);
-      }, response.length * 5 + 500);
+      }, response.length * 1 + 500);
     } catch (err: any) {
       setError(err.message || 'Failed to get response');
       console.error('Chat error:', err);
@@ -525,7 +525,7 @@ const ChatBotPage = () => {
                   </div>
                 ) : (
                   typingMessageId === message.id ? (
-                    <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
+                    <TypingText text={message.content} speed={1} onUpdate={scrollDuringTyping} />
                   ) : (
                     <MessageContent content={message.content} />
                   )
