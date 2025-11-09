@@ -192,7 +192,7 @@ const ImageToImagePage = () => {
         </div>
 
         {/* Right Side - Controls */}
-        <div className="flex flex-col gap-3 min-h-0">
+        <div className="flex flex-col gap-3 h-full">
           {/* Error Display */}
           <AnimatePresence>
             {error && (
@@ -271,7 +271,7 @@ const ImageToImagePage = () => {
             transition={{ delay: 0.2 }}
             onClick={handleProcess}
             disabled={isLoading || !image1 || !prompt.trim()}
-            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex-shrink-0"
+            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex-shrink-0 mt-auto"
           >
             {isLoading ? (
               <>
@@ -285,8 +285,6 @@ const ImageToImagePage = () => {
               </>
             )}
           </motion.button>
-
-          <p className="text-center text-gray-500 text-xs flex-shrink-0">⚠️ Processing may take time</p>
         </div>
         </div>
       </div>
