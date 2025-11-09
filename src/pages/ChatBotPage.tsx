@@ -106,8 +106,10 @@ const ChatBotPage = () => {
   };
 
   const deleteChat = async (sessionId: string) => {
+    if (!user?.uid) return;
+    
     try {
-      await deleteChatSession(sessionId);
+      await deleteChatSession(user.uid, sessionId);
       setChatSessions(prev => prev.filter(s => s.id !== sessionId));
       if (currentSessionId === sessionId) {
         startNewChat();
@@ -182,13 +184,13 @@ const ChatBotPage = () => {
       try {
         if (currentSessionId) {
           // Update existing session
-          await updateChatSession(currentSessionId, finalMessages);
+          await updateChatSession(user.uid, currentSessionId, finalMessages);
         } else {
           // Create new session
           const title = generateChatTitle(userMessage.content);
           const newSessionId = await createChatSession(user.uid, title, selectedModel);
           setCurrentSessionId(newSessionId);
-          await updateChatSession(newSessionId, finalMessages);
+          await updateChatSession(user.uid, newSessionId, finalMessages);
           // Reload history to show new chat
           loadChatHistory();
         }

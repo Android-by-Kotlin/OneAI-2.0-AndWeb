@@ -9,7 +9,8 @@ import {
   orderBy, 
   getDocs,
   Timestamp,
-  serverTimestamp
+  serverTimestamp,
+  setDoc
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { type Message } from './chatService';
@@ -27,7 +28,10 @@ export interface ChatSession {
   updatedAt: Date;
 }
 
-const CHATS_COLLECTION = 'chatSessions';
+// Match Android app structure: users/{userId}/chats/{chatId}
+const USERS_COLLECTION = 'users';
+const CHATS_COLLECTION = 'chats';
+const MESSAGES_COLLECTION = 'messages';
 
 /**
  * Create a new chat session
@@ -39,16 +43,16 @@ export async function createChatSession(
 ): Promise<string> {
   try {
     const chatData = {
-      userId,
       title,
       model,
-      messages: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
 
-    const docRef = await addDoc(collection(db, CHATS_COLLECTION), chatData);
-    return docRef.id;
+    // Match Android structure: users/{userId}/chats/{chatId}
+    const chatRef = doc(collection(db, USERS_COLLECTION, userId, CHATS_COLLECTION));
+    await setDoc(chatRef, chatData);
+    return chatRef.id;
   } catch (error) {
     console.error('Error creating chat session:', error);
     throw new Error('Failed to create chat session');
@@ -59,14 +63,15 @@ export async function createChatSession(
  * Update chat session with new messages
  */
 export async function updateChatSession(
+  userId: string,
   sessionId: string,
   messages: Message[],
   title?: string
 ): Promise<void> {
   try {
-    const chatRef = doc(db, CHATS_COLLECTION, sessionId);
+    // Match Android structure: users/{userId}/chats/{chatId}
+    const chatRef = doc(db, USERS_COLLECTION, userId, CHATS_COLLECTION, sessionId);
     const updateData: any = {
-      messages,
       updatedAt: serverTimestamp()
     };
 
@@ -75,6 +80,24 @@ export async function updateChatSession(
     }
 
     await updateDoc(chatRef, updateData);
+    
+    // Update messages subcollection
+    // Delete old messages
+    const messagesRef = collection(db, USERS_COLLECTION, userId, CHATS_COLLECTION, sessionId, MESSAGES_COLLECTION);
+    const oldMessages = await getDocs(messagesRef);
+    for (const msgDoc of oldMessages.docs) {
+      await deleteDoc(msgDoc.ref);
+    }
+    
+    // Add new messages
+    for (const message of messages) {
+      await addDoc(messagesRef, {
+        text: message.content,
+        role: message.role,
+        timestamp: Timestamp.fromMillis(message.timestamp),
+        image: message.image || null
+      });
+    }
   } catch (error) {
     console.error('Error updating chat session:', error);
     throw new Error('Failed to update chat session');
@@ -86,27 +109,46 @@ export async function updateChatSession(
  */
 export async function getUserChatSessions(userId: string): Promise<ChatSession[]> {
   try {
+    // Match Android structure: users/{userId}/chats
     const q = query(
-      collection(db, CHATS_COLLECTION),
-      where('userId', '==', userId),
+      collection(db, USERS_COLLECTION, userId, CHATS_COLLECTION),
       orderBy('updatedAt', 'desc')
     );
 
     const querySnapshot = await getDocs(q);
     const sessions: ChatSession[] = [];
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
+    // Load each chat with its messages from subcollection
+    for (const chatDoc of querySnapshot.docs) {
+      const data = chatDoc.data();
+      
+      // Load messages from subcollection
+      const messagesRef = collection(db, USERS_COLLECTION, userId, CHATS_COLLECTION, chatDoc.id, MESSAGES_COLLECTION);
+      const messagesQuery = query(messagesRef, orderBy('timestamp', 'asc'));
+      const messagesSnapshot = await getDocs(messagesQuery);
+      
+      const messages: Message[] = messagesSnapshot.docs.map(msgDoc => {
+        const msgData = msgDoc.data();
+        return {
+          id: msgDoc.id,
+          role: msgData.role,
+          content: msgData.text,
+          timestamp: msgData.timestamp?.toMillis() || Date.now(),
+          model: data.model || '',
+          image: msgData.image || undefined
+        };
+      });
+      
       sessions.push({
-        id: doc.id,
-        userId: data.userId,
+        id: chatDoc.id,
+        userId: userId,
         title: data.title,
-        model: data.model,
-        messages: data.messages || [],
+        model: data.model || '',
+        messages: messages,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date()
       });
-    });
+    }
 
     return sessions;
   } catch (error) {
@@ -118,9 +160,18 @@ export async function getUserChatSessions(userId: string): Promise<ChatSession[]
 /**
  * Delete a chat session
  */
-export async function deleteChatSession(sessionId: string): Promise<void> {
+export async function deleteChatSession(userId: string, sessionId: string): Promise<void> {
   try {
-    await deleteDoc(doc(db, CHATS_COLLECTION, sessionId));
+    // Match Android structure: users/{userId}/chats/{chatId}
+    // First delete all messages
+    const messagesRef = collection(db, USERS_COLLECTION, userId, CHATS_COLLECTION, sessionId, MESSAGES_COLLECTION);
+    const messagesSnapshot = await getDocs(messagesRef);
+    for (const msgDoc of messagesSnapshot.docs) {
+      await deleteDoc(msgDoc.ref);
+    }
+    
+    // Then delete the chat document
+    await deleteDoc(doc(db, USERS_COLLECTION, userId, CHATS_COLLECTION, sessionId));
   } catch (error) {
     console.error('Error deleting chat session:', error);
     throw new Error('Failed to delete chat session');
