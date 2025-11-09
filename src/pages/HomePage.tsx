@@ -208,7 +208,7 @@ const HomePage = () => {
             className="text-center"
           >
             <h2 className="text-6xl sm:text-7xl lg:text-8xl font-light text-white mb-8 tracking-tight">
-              Start creating
+              One New Era of AI
             </h2>
             <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto font-light">
               Transform your ideas into reality with cutting-edge AI models. Generate images, chat with AI, create videos, and more.
@@ -217,23 +217,9 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Capabilities Section */}
+      {/* Features Section */}
       <section className="py-24 px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-20"
-          >
-            <h3 className="text-5xl sm:text-6xl font-light text-white mb-6">
-              Capabilities
-            </h3>
-            <p className="text-xl text-gray-400 max-w-2xl font-light">
-              Explore our suite of AI-powered tools designed to bring your creative vision to life.
-            </p>
-          </motion.div>
 
           {/* Features Showcase */}
           <div className="space-y-32">
