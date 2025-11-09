@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon, Upload } from 'lucide-react';
 import { generateImageToVideo, pollForImageToVideo } from '../services/imageToVideoService';
+import { uploadImageToImgBB } from '../services/imageUploadService';
 
 const ImageToVideoPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const ImageToVideoPage = () => {
   const [isPolling, setIsPolling] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,22 +37,42 @@ const ImageToVideoPage = () => {
     }
 
     setUploadedFile(file);
+    setError(null);
     
-    // Convert to base64 for preview
+    // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
       setImageUrl(reader.result as string);
     };
     reader.readAsDataURL(file);
+
+    // Upload to ImgBB to get public URL
+    setIsUploading(true);
+    try {
+      const publicUrl = await uploadImageToImgBB(file);
+      setUploadedImageUrl(publicUrl);
+      console.log('Image uploaded to:', publicUrl);
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      setError(err.message || 'Failed to upload image');
+      setUploadedFile(null);
+      setImageUrl('');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleRemoveImage = () => {
     setUploadedFile(null);
     setImageUrl('');
+    setUploadedImageUrl('');
   };
 
   const handleGenerate = async () => {
-    if (!imageUrl.trim()) {
+    // Use uploaded URL if available, otherwise use the entered URL
+    const finalImageUrl = uploadedImageUrl || imageUrl.trim();
+    
+    if (!finalImageUrl) {
       setError('Please upload an image or enter an image URL');
       return;
     }
@@ -65,7 +88,7 @@ const ImageToVideoPage = () => {
     setGenerationTime(null);
 
     try {
-      const result = await generateImageToVideo(imageUrl.trim(), prompt, '', 'gen4_turbo', isPortrait);
+      const result = await generateImageToVideo(finalImageUrl, prompt, '', 'gen4_turbo', isPortrait);
       
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
@@ -151,15 +174,26 @@ const ImageToVideoPage = () => {
               </label>
               
               {!imageUrl ? (
-                <label className="w-full flex flex-col items-center justify-center h-40 px-4 py-6 bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-800/70 hover:border-primary/50 transition-all">
-                  <ImageIcon className="w-10 h-10 text-gray-500 mb-2" />
-                  <span className="text-sm text-gray-400 text-center">Click to upload image</span>
-                  <span className="text-xs text-gray-500 mt-1">or enter URL below</span>
+                <label className={`w-full flex flex-col items-center justify-center h-40 px-4 py-6 bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-800/70 hover:border-primary/50 transition-all ${
+                  isUploading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}>
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-10 h-10 text-primary animate-spin mb-2" />
+                      <span className="text-sm text-gray-400">Uploading image...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-10 h-10 text-gray-500 mb-2" />
+                      <span className="text-sm text-gray-400 text-center">Click to upload image</span>
+                      <span className="text-xs text-gray-500 mt-1">or enter URL below</span>
+                    </>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileUpload}
-                    disabled={isGenerating}
+                    disabled={isGenerating || isUploading}
                     className="hidden"
                   />
                 </label>
