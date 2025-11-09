@@ -247,22 +247,19 @@ const HomePage = () => {
                       )}
 
                       {feature.title === 'Video Generation' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          {/* Play button with pulsing effect */}
-                          <motion.div
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="relative"
+                        <div className="absolute inset-0">
+                          {/* Showcase Video */}
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover"
                           >
-                            <motion.div
-                              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                              className={`absolute inset-0 rounded-full bg-gradient-to-br ${feature.gradient} blur-xl`}
-                            />
-                            <div className={`relative w-24 h-24 rounded-full bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
-                              <div className="scale-150">{feature.icon}</div>
-                            </div>
-                          </motion.div>
+                            <source src="https://p2-kling.klingai.com/kcdn/cdn-kcdn112452/kling-website/web-page2-6-new.mp4" type="video/mp4" />
+                          </video>
+                          {/* Gradient overlay for depth */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50" />
                         </div>
                       )}
 
