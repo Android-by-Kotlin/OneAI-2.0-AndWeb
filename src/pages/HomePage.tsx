@@ -255,31 +255,15 @@ const HomePage = () => {
                       )}
 
                       {feature.title === 'Inpainting' && (
-                        <div className="absolute inset-0 p-8 flex items-center justify-center">
-                          {/* Magic wand effect */}
-                          <div className="relative w-full h-full">
-                            <motion.div
-                              animate={{ 
-                                rotate: [0, 15, -15, 0],
-                                scale: [1, 1.05, 1]
-                              }}
-                              transition={{ duration: 3, repeat: Infinity }}
-                              className={`absolute top-1/4 left-1/4 w-1/3 h-1/3 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-40 blur-lg`}
-                            />
-                            <motion.div
-                              animate={{ 
-                                scale: [0, 1, 0],
-                                opacity: [0, 0.6, 0]
-                              }}
-                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
-                              className={`absolute top-1/3 right-1/3 w-3 h-3 rounded-full bg-gradient-to-br ${feature.gradient}`}
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
-                                {feature.icon}
-                              </div>
-                            </div>
-                          </div>
+                        <div className="absolute inset-0">
+                          {/* Showcase Image */}
+                          <img
+                            src="https://cdn.pokecut.com/resource/webseo/aiinpainting_intro1_25081220031215.webp"
+                            alt="AI Inpainting Example"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          {/* Gradient overlay for depth */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                         </div>
                       )}
 
