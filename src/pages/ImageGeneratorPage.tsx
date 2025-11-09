@@ -141,7 +141,7 @@ const ImageGeneratorPage = () => {
         </div>
 
         {/* Right Side - Controls */}
-        <div className="flex flex-col gap-3 min-h-0">
+        <div className="flex flex-col gap-3 h-full">
           {/* Error Display */}
           <AnimatePresence>
             {error && (
@@ -198,7 +198,7 @@ const ImageGeneratorPage = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass rounded-xl p-4 flex-1 min-h-0 flex flex-col"
+            className="glass rounded-xl p-4 flex-1 overflow-hidden flex flex-col"
           >
             <label className="text-gray-300 text-sm font-medium mb-2 block flex-shrink-0">Creative Prompt</label>
             <textarea
@@ -210,14 +210,14 @@ const ImageGeneratorPage = () => {
             />
           </motion.div>
 
-          {/* Generate Button */}
+          {/* Generate Button - Pushed to bottom */}
           <motion.button
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
-            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex-shrink-0"
+            className="w-full glass hover:bg-white/10 rounded-xl p-4 flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex-shrink-0 mt-auto"
           >
             {isLoading ? (
               <>
@@ -231,11 +231,6 @@ const ImageGeneratorPage = () => {
               </>
             )}
           </motion.button>
-
-          {/* Warning */}
-          <p className="text-center text-gray-500 text-xs flex-shrink-0">
-            ⚠️ Some models may not work due to heavy traffic
-          </p>
         </div>
       </div>
     </div>
