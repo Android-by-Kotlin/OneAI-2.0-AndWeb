@@ -235,11 +235,6 @@ const HomePage = () => {
                 <div className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
                   {/* Text Content */}
                   <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                    <div className="mb-6">
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4`}>
-                        {feature.icon}
-                      </div>
-                    </div>
                     <h4 className="text-4xl sm:text-5xl font-light text-white mb-6">
                       {feature.title}
                     </h4>
