@@ -14,7 +14,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import MessageContent from '../components/MessageContent';
 
-// Typing effect component
+// Typing effect component with live formatting
 const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,7 +33,8 @@ const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: numbe
     }
   }, [currentIndex, text, speed, onUpdate]);
 
-  return <span>{displayedText}</span>;
+  // Return formatted content as it types
+  return <MessageContent content={displayedText} />;
 };
 
 const ChatBotPage = () => {
@@ -523,15 +524,11 @@ const ChatBotPage = () => {
                     {message.content}
                   </div>
                 ) : (
-                  <>
-                    {typingMessageId === message.id ? (
-                      <div className="text-gray-300 leading-7">
-                        <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
-                      </div>
-                    ) : (
-                      <MessageContent content={message.content} />
-                    )}
-                  </>
+                  typingMessageId === message.id ? (
+                    <TypingText text={message.content} speed={5} onUpdate={scrollDuringTyping} />
+                  ) : (
+                    <MessageContent content={message.content} />
+                  )
                 )}
                 <div className="text-xs opacity-50 mt-3 text-gray-400">
                   {new Date(message.timestamp).toLocaleTimeString()}
