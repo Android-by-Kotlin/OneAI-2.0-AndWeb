@@ -189,7 +189,7 @@ const HomePage = () => {
                     </button>
                   </div>
 
-                  {/* Visual Placeholder */}
+                  {/* Visual Showcase */}
                   <div className={index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}>
                     <motion.div
                       whileHover={{ scale: 1.02 }}
@@ -197,18 +197,142 @@ const HomePage = () => {
                       onClick={() => navigate(feature.route)}
                       className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800 cursor-pointer group"
                     >
-                      {/* Gradient Overlay */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-20 group-hover:opacity-30 transition-opacity duration-300`} />
-                      
-                      {/* Center Icon */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
-                          <div className="scale-150">{feature.icon}</div>
+                      {/* Dynamic Content based on feature */}
+                      {feature.title === 'Image Generation' && (
+                        <div className="absolute inset-0">
+                          {/* Animated grid of generated images effect */}
+                          <div className="grid grid-cols-2 gap-2 p-4 h-full">
+                            {[0, 1, 2, 3].map((i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.95, 1, 0.95] }}
+                                transition={{ duration: 3, delay: i * 0.3, repeat: Infinity }}
+                                className={`rounded-2xl bg-gradient-to-br ${feature.gradient} blur-sm`}
+                              />
+                            ))}
+                          </div>
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+                            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
+                              {feature.icon}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
+                      {feature.title === 'Image Transform' && (
+                        <div className="absolute inset-0 flex items-center justify-center p-8">
+                          {/* Before/After effect */}
+                          <div className="relative w-full h-full">
+                            <motion.div
+                              animate={{ x: [-20, 20, -20] }}
+                              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                              className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-30 blur-xl`}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
+                                {feature.icon}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {feature.title === 'AI Chat' && (
+                        <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                          {/* Chat bubbles animation */}
+                          <div className="space-y-3">
+                            {[0, 1, 2].map((i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: [0, 1, 1, 0], x: [-20, 0, 0, -20] }}
+                                transition={{ duration: 3, delay: i * 0.8, repeat: Infinity, repeatDelay: 1 }}
+                                className={`h-4 rounded-full bg-gradient-to-r ${feature.gradient} ${i === 0 ? 'w-3/4' : i === 1 ? 'w-2/3 ml-auto' : 'w-1/2'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {feature.title === 'Video Generation' && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {/* Play button with pulsing effect */}
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="relative"
+                          >
+                            <motion.div
+                              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className={`absolute inset-0 rounded-full bg-gradient-to-br ${feature.gradient} blur-xl`}
+                            />
+                            <div className={`relative w-24 h-24 rounded-full bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
+                              <div className="scale-150">{feature.icon}</div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      )}
+
+                      {feature.title === 'Inpainting' && (
+                        <div className="absolute inset-0 p-8 flex items-center justify-center">
+                          {/* Magic wand effect */}
+                          <div className="relative w-full h-full">
+                            <motion.div
+                              animate={{ 
+                                rotate: [0, 15, -15, 0],
+                                scale: [1, 1.05, 1]
+                              }}
+                              transition={{ duration: 3, repeat: Infinity }}
+                              className={`absolute top-1/4 left-1/4 w-1/3 h-1/3 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-40 blur-lg`}
+                            />
+                            <motion.div
+                              animate={{ 
+                                scale: [0, 1, 0],
+                                opacity: [0, 0.6, 0]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
+                              className={`absolute top-1/3 right-1/3 w-3 h-3 rounded-full bg-gradient-to-br ${feature.gradient}`}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
+                                {feature.icon}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {feature.title === 'Live Avatar' && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {/* Audio wave effect */}
+                          <div className="flex items-center gap-2">
+                            {[0, 1, 2, 3, 4].map((i) => (
+                              <motion.div
+                                key={i}
+                                animate={{ 
+                                  height: [20, 60, 20],
+                                  opacity: [0.3, 1, 0.3]
+                                }}
+                                transition={{ 
+                                  duration: 1,
+                                  delay: i * 0.1,
+                                  repeat: Infinity,
+                                  ease: "easeInOut"
+                                }}
+                                className={`w-2 rounded-full bg-gradient-to-t ${feature.gradient}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Gradient overlay on hover */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                      
                       {/* Blur effect at edges */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
                     </motion.div>
                   </div>
                 </div>
