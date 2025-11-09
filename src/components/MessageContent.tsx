@@ -33,27 +33,42 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  // Detect if content is markdown or plain text
-  const isMarkdown = (text: string): boolean => {
+  // Detect if content is markdown or has formatting
+  const hasMarkdownOrFormatting = (text: string): boolean => {
     // Check for common markdown patterns
     const markdownPatterns = [
       /^#{1,6}\s/m,           // Headers
-      /\*\*.*\*\*/,           // Bold
-      /\*.*\*/,               // Italic
-      /```[\s\S]*```/,        // Code blocks
+      /\*\*[^*]+\*\*/,        // Bold (more specific)
+      /\*[^*\s][^*]*\*/,      // Italic (excluding single asterisks)
+      /```[\s\S]*?```/,       // Code blocks
       /`[^`]+`/,              // Inline code
       /^\s*[-*+]\s/m,         // Unordered lists
       /^\s*\d+\.\s/m,         // Ordered lists
-      /\[.*\]\(.*\)/,         // Links
+      /\[.+?\]\(.+?\)/,       // Links (more specific)
       /^>\s/m,                // Blockquotes
+      /^---+$/m,              // Horizontal rules
+      /\n\n/,                 // Multiple line breaks (paragraph separation)
+      /\n.*:\n/,              // Text with colons (often used for structure)
     ];
     return markdownPatterns.some(pattern => pattern.test(text));
   };
 
-  // If content looks like plain text (not markdown), convert \n to <br />
-  if (!isMarkdown(content)) {
+  // Check if content has any markdown or formatting
+  const shouldUseMarkdown = hasMarkdownOrFormatting(content);
+  
+  // For plain text with single line breaks, preserve formatting with whitespace-pre-wrap
+  if (!shouldUseMarkdown && content.includes('\n')) {
     return (
       <div className="text-gray-100 leading-7 break-words whitespace-pre-wrap">
+        {content}
+      </div>
+    );
+  }
+  
+  // For very simple single-line text, render as plain text
+  if (!shouldUseMarkdown && !content.includes('\n')) {
+    return (
+      <div className="text-gray-100 leading-7 break-words">
         {content}
       </div>
     );
