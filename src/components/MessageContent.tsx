@@ -13,6 +13,20 @@ interface MessageContentProps {
 const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
   const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
 
+  // Extract text from React children (handles nested elements)
+  const extractText = (children: any): string => {
+    if (typeof children === 'string') {
+      return children;
+    }
+    if (Array.isArray(children)) {
+      return children.map(extractText).join('');
+    }
+    if (children?.props?.children) {
+      return extractText(children.props.children);
+    }
+    return '';
+  };
+
   const copyToClipboard = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(id);
@@ -28,7 +42,8 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
           // Custom code block rendering
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
-            const code = String(children).replace(/\n$/, '');
+            // Extract plain text from children properly
+            const codeText = extractText(children);
             const codeId = `code-${Math.random()}`;
 
             if (!inline && match) {
@@ -38,7 +53,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
                   <div className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-t-lg border-b border-gray-700">
                     <span className="text-xs font-mono text-gray-400">{match[1]}</span>
                     <button
-                      onClick={() => copyToClipboard(code, codeId)}
+                      onClick={() => copyToClipboard(codeText, codeId)}
                       className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
                     >
                       {copiedCode === codeId ? (
