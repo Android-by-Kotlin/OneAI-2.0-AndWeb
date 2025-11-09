@@ -91,8 +91,8 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
               return (
                 <div className="relative group my-4">
                   {/* Language label */}
-                  <div className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-t-lg border-b border-gray-700">
-                    <span className="text-xs font-mono text-gray-400">{match[1]}</span>
+                  <div className="flex items-center justify-between bg-black px-4 py-2 rounded-t-lg border-b border-gray-700">
+                    <span className="text-sm font-mono text-gray-400">{match[1]}</span>
                     <button
                       onClick={() => copyToClipboard(codeText, codeId)}
                       className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
@@ -111,8 +111,8 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
                     </button>
                   </div>
                   {/* Code content */}
-                  <pre className="!mt-0 !rounded-t-none !bg-gray-900 !p-4 overflow-x-auto">
-                    <code className={className} {...props}>
+                  <pre className="!mt-0 !rounded-t-none !bg-black !p-4 overflow-x-auto">
+                    <code className={`${className} !text-base`} {...props}>
                       {children}
                     </code>
                   </pre>
@@ -123,7 +123,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
             // Inline code
             return (
               <code
-                className="bg-gray-800 text-emerald-400 px-1.5 py-0.5 rounded text-sm font-mono"
+                className="bg-gray-800 text-emerald-400 px-1.5 py-0.5 rounded text-base font-mono"
                 {...props}
               >
                 {children}
