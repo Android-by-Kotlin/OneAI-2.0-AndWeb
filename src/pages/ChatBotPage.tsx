@@ -332,7 +332,7 @@ const ChatBotPage = () => {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 260, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="glass-dark border-r border-white border-opacity-10 overflow-hidden flex-shrink-0"
+            className="glass-dark border-r border-white border-opacity-10 overflow-hidden flex-shrink-0 h-screen"
           >
             <div className="h-full flex flex-col">
               {/* Sidebar Header */}
@@ -347,7 +347,7 @@ const ChatBotPage = () => {
               </div>
 
               {/* Chat History List */}
-              <div className="flex-1 overflow-y-auto p-2">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden p-2" style={{ scrollbarWidth: 'thin' }}>
                 {isLoadingHistory ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader className="w-5 h-5 animate-spin text-primary" />
