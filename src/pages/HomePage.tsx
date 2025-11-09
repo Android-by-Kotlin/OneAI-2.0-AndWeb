@@ -87,15 +87,15 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Gradient colors for each section
+  // Gradient colors for each section - enhanced with richer tones
   const ambientColors = [
-    { from: 'rgba(139, 92, 246, 0.15)', to: 'rgba(59, 130, 246, 0.15)' }, // Hero - purple to blue
-    { from: 'rgba(59, 130, 246, 0.15)', to: 'rgba(6, 182, 212, 0.15)' },   // Image Gen - blue to cyan
-    { from: 'rgba(168, 85, 247, 0.15)', to: 'rgba(236, 72, 153, 0.15)' },  // Image Transform - purple to pink
-    { from: 'rgba(34, 197, 94, 0.15)', to: 'rgba(16, 185, 129, 0.15)' },   // AI Chat - green to emerald
-    { from: 'rgba(20, 184, 166, 0.15)', to: 'rgba(6, 182, 212, 0.15)' },   // Video Gen - teal to cyan
-    { from: 'rgba(99, 102, 241, 0.15)', to: 'rgba(168, 85, 247, 0.15)' },  // Inpainting - indigo to purple
-    { from: 'rgba(236, 72, 153, 0.15)', to: 'rgba(244, 63, 94, 0.15)' },   // Live Avatar - pink to rose
+    { from: 'rgba(139, 92, 246, 0.35)', to: 'rgba(59, 130, 246, 0.25)', accent: 'rgba(147, 51, 234, 0.2)' }, // Hero - purple to blue
+    { from: 'rgba(59, 130, 246, 0.35)', to: 'rgba(6, 182, 212, 0.25)', accent: 'rgba(37, 99, 235, 0.2)' },   // Image Gen - blue to cyan
+    { from: 'rgba(168, 85, 247, 0.35)', to: 'rgba(236, 72, 153, 0.25)', accent: 'rgba(192, 38, 211, 0.2)' }, // Image Transform - purple to pink
+    { from: 'rgba(34, 197, 94, 0.35)', to: 'rgba(16, 185, 129, 0.25)', accent: 'rgba(22, 163, 74, 0.2)' },   // AI Chat - green to emerald
+    { from: 'rgba(20, 184, 166, 0.35)', to: 'rgba(6, 182, 212, 0.25)', accent: 'rgba(13, 148, 136, 0.2)' },  // Video Gen - teal to cyan
+    { from: 'rgba(99, 102, 241, 0.35)', to: 'rgba(168, 85, 247, 0.25)', accent: 'rgba(124, 58, 237, 0.2)' }, // Inpainting - indigo to purple
+    { from: 'rgba(236, 72, 153, 0.35)', to: 'rgba(244, 63, 94, 0.25)', accent: 'rgba(219, 39, 119, 0.2)' },  // Live Avatar - pink to rose
   ];
 
   const currentGradient = ambientColors[currentSection];
@@ -113,49 +113,52 @@ const HomePage = () => {
     <div className="min-h-screen bg-black text-white relative">
       {/* Ambient Light Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Top Left Ambient Light */}
+        {/* Vignette Overlay - Darker edges */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black opacity-60" />
+        
+        {/* Bottom Vignette - Strong purple/blue glow */}
         <motion.div
           animate={{
-            background: `radial-gradient(circle at 20% 20%, ${currentGradient.from} 0%, transparent 50%)`,
+            background: `radial-gradient(ellipse at 50% 120%, ${currentGradient.from} 0%, ${currentGradient.accent} 30%, transparent 70%)`,
           }}
           transition={{ duration: 1, ease: "easeInOut" }}
-          className="absolute -top-40 -left-40 w-96 h-96 blur-3xl"
+          className="absolute inset-0 blur-3xl"
         />
         
-        {/* Top Right Ambient Light */}
+        {/* Left Side Glow */}
         <motion.div
           animate={{
-            background: `radial-gradient(circle at 80% 20%, ${currentGradient.to} 0%, transparent 50%)`,
-          }}
-          transition={{ duration: 1, ease: "easeInOut", delay: 0.2 }}
-          className="absolute -top-40 -right-40 w-96 h-96 blur-3xl"
-        />
-        
-        {/* Center Ambient Light */}
-        <motion.div
-          animate={{
-            background: `radial-gradient(circle at 50% 50%, ${currentGradient.from} 0%, transparent 60%)`,
+            background: `radial-gradient(ellipse at 0% 50%, ${currentGradient.from} 0%, transparent 60%)`,
           }}
           transition={{ duration: 1, ease: "easeInOut", delay: 0.1 }}
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] blur-3xl opacity-40"
+          className="absolute inset-0 blur-3xl opacity-60"
         />
         
-        {/* Bottom Left Ambient Light */}
+        {/* Right Side Glow */}
         <motion.div
           animate={{
-            background: `radial-gradient(circle at 20% 80%, ${currentGradient.to} 0%, transparent 50%)`,
+            background: `radial-gradient(ellipse at 100% 50%, ${currentGradient.to} 0%, transparent 60%)`,
           }}
-          transition={{ duration: 1, ease: "easeInOut", delay: 0.3 }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 blur-3xl"
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.2 }}
+          className="absolute inset-0 blur-3xl opacity-60"
         />
         
-        {/* Bottom Right Ambient Light */}
+        {/* Top Subtle Glow */}
         <motion.div
           animate={{
-            background: `radial-gradient(circle at 80% 80%, ${currentGradient.from} 0%, transparent 50%)`,
+            background: `radial-gradient(ellipse at 50% -20%, ${currentGradient.accent} 0%, transparent 50%)`,
           }}
           transition={{ duration: 1, ease: "easeInOut", delay: 0.15 }}
-          className="absolute -bottom-40 -right-40 w-96 h-96 blur-3xl"
+          className="absolute inset-0 blur-3xl opacity-40"
+        />
+        
+        {/* Center Depth Layer */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 50% 50%, ${currentGradient.accent} 0%, transparent 70%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.25 }}
+          className="absolute inset-0 blur-3xl opacity-30"
         />
       </div>
 
