@@ -7,6 +7,7 @@ interface ImageToVideoRequest {
   init_image: string;
   prompt: string;
   negative_prompt?: string;
+  portrait?: boolean;
 }
 
 interface ImageToVideoResponse {
@@ -28,21 +29,24 @@ interface VideoPollRequest {
   request_id: string;
 }
 
-// Generate video from image using Seedance I2V model
+// Generate video from image using Seedance I2V or Gen4 Turbo model
 export async function generateImageToVideo(
   imageUrl: string,
   prompt: string,
-  negativePrompt: string = 'blurry, low quality, distorted, artifacts, bad anatomy'
+  negativePrompt: string = 'blurry, low quality, distorted, artifacts, bad anatomy',
+  modelId: string = 'gen4_turbo',
+  portrait: boolean = true
 ): Promise<{ videoUrl?: string; requestId?: string; generationTime?: number }> {
   try {
     console.log('Starting Seedance I2V image-to-video generation...');
     
     const requestBody: ImageToVideoRequest = {
       key: API_CONFIG.MODELSLAB_API_KEY,
-      model_id: 'seedance-i2v',
+      model_id: modelId,
       init_image: imageUrl,
       prompt: prompt,
-      negative_prompt: negativePrompt
+      ...(modelId === 'gen4_turbo' && { portrait: portrait }),
+      ...(negativePrompt && { negative_prompt: negativePrompt })
     };
 
     console.log('Sending Seedance I2V request to API...', requestBody);

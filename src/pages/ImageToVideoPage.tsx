@@ -14,6 +14,8 @@ const ImageToVideoPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(true);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const handleGenerate = async () => {
     if (!imageUrl.trim()) {
@@ -32,7 +34,7 @@ const ImageToVideoPage = () => {
     setGenerationTime(null);
 
     try {
-      const result = await generateImageToVideo(imageUrl.trim(), prompt, '');
+      const result = await generateImageToVideo(imageUrl.trim(), prompt, '', 'gen4_turbo', isPortrait);
       
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
@@ -94,7 +96,21 @@ const ImageToVideoPage = () => {
                 <Video className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-white">Create Video</h2>
               </div>
-              <p className="text-gray-400 text-sm">Using Seedance I2V Model</p>
+              <p className="text-gray-400 text-sm">Using Gen4 Turbo Model</p>
+            </div>
+
+            {/* Portrait Toggle */}
+            <div className="flex items-center justify-between py-2 px-3 bg-gray-800/30 rounded-lg">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isPortrait}
+                  onChange={(e) => setIsPortrait(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary focus:ring-offset-gray-900"
+                  disabled={isGenerating}
+                />
+                <span className="text-sm text-gray-300">Portrait</span>
+              </label>
             </div>
 
             {/* Image URL Input */}
