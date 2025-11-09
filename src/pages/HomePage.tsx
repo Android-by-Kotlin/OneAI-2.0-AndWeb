@@ -200,23 +200,14 @@ const HomePage = () => {
                       {/* Dynamic Content based on feature */}
                       {feature.title === 'Image Generation' && (
                         <div className="absolute inset-0">
-                          {/* Animated grid of generated images effect */}
-                          <div className="grid grid-cols-2 gap-2 p-4 h-full">
-                            {[0, 1, 2, 3].map((i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.95, 1, 0.95] }}
-                                transition={{ duration: 3, delay: i * 0.3, repeat: Infinity }}
-                                className={`rounded-2xl bg-gradient-to-br ${feature.gradient} blur-sm`}
-                              />
-                            ))}
-                          </div>
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
-                            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
-                              {feature.icon}
-                            </div>
-                          </div>
+                          {/* Showcase Image */}
+                          <img
+                            src="https://drive.google.com/uc?export=view&id=1WXyBE-yigEiXK9pN_ENzexJ8G-f5yTcy"
+                            alt="AI Generated Image Example"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          {/* Gradient overlay for depth */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                         </div>
                       )}
 
