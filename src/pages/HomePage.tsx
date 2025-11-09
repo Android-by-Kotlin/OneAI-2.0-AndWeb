@@ -52,11 +52,11 @@ const HomePage = () => {
       route: '/chatbot',
     },
     {
-      title: 'Video Generation',
-      description: 'Create videos from text prompts or animate your images',
+      title: 'Image to Video',
+      description: 'Upload an image and generate videos with Gen4 Turbo AI model',
       icon: <Clapperboard className="w-8 h-8" />,
       gradient: 'from-teal-500 to-cyan-500',
-      route: '/text-to-video',
+      route: '/image-to-video',
     },
     {
       title: 'Inpainting',
@@ -302,7 +302,7 @@ const HomePage = () => {
                         </div>
                       )}
 
-                      {feature.title === 'Video Generation' && (
+                      {feature.title === 'Image to Video' && (
                         <div className="absolute inset-0">
                           {/* Showcase Video */}
                           <video

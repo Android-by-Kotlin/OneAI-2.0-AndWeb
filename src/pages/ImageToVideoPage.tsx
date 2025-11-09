@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon, Upload } from 'lucide-react';
+import { ArrowLeft, Video, Loader2, Download, X, Play, Image as ImageIcon } from 'lucide-react';
 import { generateImageToVideo, pollForImageToVideo } from '../services/imageToVideoService';
-import { uploadImageToImgBB } from '../services/imageUploadService';
 
 const ImageToVideoPage = () => {
   const navigate = useNavigate();
@@ -15,65 +14,11 @@ const ImageToVideoPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   const [isPolling, setIsPolling] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(true);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Check if file is an image
-    if (!file.type.startsWith('image/')) {
-      setError('Please upload a valid image file');
-      return;
-    }
-
-    // Check file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image file size must be less than 10MB');
-      return;
-    }
-
-    setUploadedFile(file);
-    setError(null);
-    
-    // Show preview immediately
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImageUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to ImgBB to get public URL
-    setIsUploading(true);
-    try {
-      const publicUrl = await uploadImageToImgBB(file);
-      setUploadedImageUrl(publicUrl);
-      console.log('Image uploaded to:', publicUrl);
-    } catch (err: any) {
-      console.error('Upload error:', err);
-      setError(err.message || 'Failed to upload image');
-      setUploadedFile(null);
-      setImageUrl('');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setUploadedFile(null);
-    setImageUrl('');
-    setUploadedImageUrl('');
-  };
 
   const handleGenerate = async () => {
-    // Use uploaded URL if available, otherwise use the entered URL
-    const finalImageUrl = uploadedImageUrl || imageUrl.trim();
-    
-    if (!finalImageUrl) {
-      setError('Please upload an image or enter an image URL');
+    if (!imageUrl.trim()) {
+      setError('Please enter an image URL');
       return;
     }
 
@@ -88,7 +33,7 @@ const ImageToVideoPage = () => {
     setGenerationTime(null);
 
     try {
-      const result = await generateImageToVideo(finalImageUrl, prompt, '', 'gen4_turbo', isPortrait);
+      const result = await generateImageToVideo(imageUrl.trim(), prompt);
       
       if (result.videoUrl) {
         setVideoUrl(result.videoUrl);
@@ -150,80 +95,29 @@ const ImageToVideoPage = () => {
                 <Video className="w-6 h-6 text-primary" />
                 <h2 className="text-xl font-bold text-white">Create Video</h2>
               </div>
-              <p className="text-gray-400 text-sm">Using Gen4 Turbo Model</p>
+              <p className="text-gray-400 text-sm">Using Seedance I2V Model</p>
             </div>
 
-            {/* Portrait Toggle */}
-            <div className="flex items-center justify-between py-2 px-3 bg-gray-800/30 rounded-lg">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isPortrait}
-                  onChange={(e) => setIsPortrait(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary focus:ring-offset-gray-900"
-                  disabled={isGenerating}
-                />
-                <span className="text-sm text-gray-300">Portrait</span>
-              </label>
-            </div>
-
-            {/* Reference Image Upload */}
+            {/* Image URL Input */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Reference Image *
+                Image URL *
               </label>
-              
-              {!imageUrl ? (
-                <label className={`w-full flex flex-col items-center justify-center h-40 px-4 py-6 bg-gray-800/50 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-800/70 hover:border-primary/50 transition-all ${
-                  isUploading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}>
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="w-10 h-10 text-primary animate-spin mb-2" />
-                      <span className="text-sm text-gray-400">Uploading image...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-10 h-10 text-gray-500 mb-2" />
-                      <span className="text-sm text-gray-400 text-center">Click to upload image</span>
-                      <span className="text-xs text-gray-500 mt-1">or enter URL below</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    disabled={isGenerating || isUploading}
-                    className="hidden"
-                  />
-                </label>
-              ) : (
-                <div className="relative bg-gray-800/50 rounded-lg overflow-hidden" style={{ height: '200px' }}>
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                disabled={isGenerating}
+              />
+              {imageUrl && (
+                <div className="mt-3 bg-gray-800/50 rounded-lg overflow-hidden" style={{ height: '150px' }}>
                   <img 
                     src={imageUrl} 
-                    alt="Reference" 
+                    alt="Preview" 
                     className="w-full h-full object-contain"
-                  />
-                  <button
-                    onClick={handleRemoveImage}
-                    disabled={isGenerating}
-                    className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 rounded-full transition-colors disabled:opacity-50"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
-                </div>
-              )}
-              
-              {/* Alternative: Enter URL */}
-              {!imageUrl && (
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="Or paste image URL here"
-                    className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                    disabled={isGenerating}
+                    onError={() => setError('Invalid image URL')}
                   />
                 </div>
               )}

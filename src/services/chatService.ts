@@ -20,7 +20,8 @@ export interface ChatModel {
 
 export const AVAILABLE_MODELS: ChatModel[] = [
   {
-    id: 'models/gemini-2.0-flash',
+     id: 'models/gemini-2.0-flash',
+   // id: 'gemini-2.5-flash',
     name: 'Gemini 2.0 Flash',
     provider: 'google',
     description: ' Vision | Fast and efficient model for general tasks'
