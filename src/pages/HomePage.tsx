@@ -305,26 +305,19 @@ const HomePage = () => {
                       )}
 
                       {feature.title === 'Live Avatar' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          {/* Audio wave effect */}
-                          <div className="flex items-center gap-2">
-                            {[0, 1, 2, 3, 4].map((i) => (
-                              <motion.div
-                                key={i}
-                                animate={{ 
-                                  height: [20, 60, 20],
-                                  opacity: [0.3, 1, 0.3]
-                                }}
-                                transition={{ 
-                                  duration: 1,
-                                  delay: i * 0.1,
-                                  repeat: Infinity,
-                                  ease: "easeInOut"
-                                }}
-                                className={`w-2 rounded-full bg-gradient-to-t ${feature.gradient}`}
-                              />
-                            ))}
-                          </div>
+                        <div className="absolute inset-0">
+                          {/* Avatar Video */}
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover"
+                          >
+                            <source src="https://files2.heygen.ai/avatar/v3/26c9a98335d7429da6ed3215d961e080_39190/preview_video_target.mp4" type="video/mp4" />
+                          </video>
+                          {/* Subtle overlay for text visibility */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50" />
                         </div>
                       )}
 
