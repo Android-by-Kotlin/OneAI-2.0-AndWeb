@@ -33,6 +33,32 @@ const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  // Detect if content is markdown or plain text
+  const isMarkdown = (text: string): boolean => {
+    // Check for common markdown patterns
+    const markdownPatterns = [
+      /^#{1,6}\s/m,           // Headers
+      /\*\*.*\*\*/,           // Bold
+      /\*.*\*/,               // Italic
+      /```[\s\S]*```/,        // Code blocks
+      /`[^`]+`/,              // Inline code
+      /^\s*[-*+]\s/m,         // Unordered lists
+      /^\s*\d+\.\s/m,         // Ordered lists
+      /\[.*\]\(.*\)/,         // Links
+      /^>\s/m,                // Blockquotes
+    ];
+    return markdownPatterns.some(pattern => pattern.test(text));
+  };
+
+  // If content looks like plain text (not markdown), convert \n to <br />
+  if (!isMarkdown(content)) {
+    return (
+      <div className="text-gray-100 leading-7 break-words whitespace-pre-wrap">
+        {content}
+      </div>
+    );
+  }
+
   return (
     <div className="prose prose-invert prose-sm max-w-none break-words">
       <ReactMarkdown
