@@ -225,19 +225,15 @@ const HomePage = () => {
                       )}
 
                       {feature.title === 'AI Chat' && (
-                        <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                          {/* Chat bubbles animation */}
-                          <div className="space-y-3">
-                            {[0, 1, 2].map((i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: [0, 1, 1, 0], x: [-20, 0, 0, -20] }}
-                                transition={{ duration: 3, delay: i * 0.8, repeat: Infinity, repeatDelay: 1 }}
-                                className={`h-4 rounded-full bg-gradient-to-r ${feature.gradient} ${i === 0 ? 'w-3/4' : i === 1 ? 'w-2/3 ml-auto' : 'w-1/2'}`}
-                              />
-                            ))}
-                          </div>
+                        <div className="absolute inset-0">
+                          {/* Showcase Image */}
+                          <img
+                            src="https://yostrato.com/wp-content/uploads/2024/09/yostrato.jpg"
+                            alt="AI Chat Interface Example"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          {/* Gradient overlay for depth */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                         </div>
                       )}
 
