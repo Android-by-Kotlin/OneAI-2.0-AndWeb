@@ -64,9 +64,42 @@ const ImageGeneratorPage = () => {
   };
   
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
+    <div className="h-screen bg-black overflow-hidden flex flex-col relative">
+      {/* Ambient Light Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black opacity-60" />
+        
+        {/* Bottom Vignette - Blue/Cyan glow */}
+        <div className="absolute inset-0 blur-3xl" style={{
+          background: 'radial-gradient(ellipse at 50% 120%, rgba(59, 130, 246, 0.35) 0%, rgba(6, 182, 212, 0.2) 30%, transparent 70%)'
+        }} />
+        
+        {/* Left Side Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-60" style={{
+          background: 'radial-gradient(ellipse at 0% 50%, rgba(59, 130, 246, 0.35) 0%, transparent 60%)'
+        }} />
+        
+        {/* Right Side Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-60" style={{
+          background: 'radial-gradient(ellipse at 100% 50%, rgba(6, 182, 212, 0.25) 0%, transparent 60%)'
+        }} />
+        
+        {/* Top Subtle Glow */}
+        <div className="absolute inset-0 blur-3xl opacity-40" style={{
+          background: 'radial-gradient(ellipse at 50% -20%, rgba(37, 99, 235, 0.2) 0%, transparent 50%)'
+        }} />
+        
+        {/* Center Depth Layer */}
+        <div className="absolute inset-0 blur-3xl opacity-30" style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 70%)'
+        }} />
+      </div>
+      
+      {/* Content with proper z-index */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 flex-shrink-0">
         <button 
           onClick={() => navigate('/home')}
           className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
@@ -76,10 +109,10 @@ const ImageGeneratorPage = () => {
         </button>
         <h1 className="text-2xl font-bold gradient-text">Text to Image</h1>
         <div className="w-20"></div>
-      </div>
+        </div>
 
-      {/* Main Content - Grid Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 pt-0 overflow-hidden">
+        {/* Main Content - Grid Layout */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 pt-0 overflow-hidden">
         {/* Left Side - Image Display */}
         <div className="flex flex-col gap-3 min-h-0">
           <motion.div
@@ -231,6 +264,7 @@ const ImageGeneratorPage = () => {
               </>
             )}
           </motion.button>
+        </div>
         </div>
       </div>
     </div>
