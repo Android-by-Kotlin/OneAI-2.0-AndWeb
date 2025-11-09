@@ -24,72 +24,62 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     provider: 'google',
     description: 'Fast and efficient model for general tasks'
   },
-  {
-    id: 'models/gemini-1.5-pro',
-    name: 'Gemini 1.5 Pro',
-    provider: 'google',
-    description: 'Advanced model for complex reasoning'
-  },
-  {
-    id: 'google/gemini-2.0-flash-exp:free',
-    name: 'Gemini 2.0 Flash (OpenRouter)',
-    provider: 'openrouter',
-    description: 'Via OpenRouter - Free tier'
-  },
-  {
-    id: 'anthropic/claude-3.5-sonnet',
-    name: 'Claude 3.5 Sonnet',
-    provider: 'openrouter',
-    description: 'Anthropic\'s most capable model'
-  },
-  {
-    id: 'openai/gpt-4-turbo',
-    name: 'GPT-4 Turbo',
-    provider: 'openrouter',
-    description: 'OpenAI\'s most advanced model'
-  },
+  
+ 
+  // {
+  //   id: 'openai/gpt-4-turbo',
+  //   name: 'GPT-4 Turbo',
+  //   provider: 'openrouter',
+  //   description: 'OpenAI\'s most advanced model'
+  // },
   {
     id: 'meta-llama/llama-3.1-70b-instruct',
     name: 'Llama 3.1 70B',
     provider: 'openrouter',
     description: 'Meta\'s open source model'
   },
-  {
-    id: 'provider-5/gpt-4o-mini',
-    name: 'GPT-4o Mini',
-    provider: 'a4f',
-    description: 'Fast and efficient GPT-4o mini via A4F'
-  },
-  {
-    id: 'provider-5/gpt-4o',
-    name: 'GPT-4o',
-    provider: 'a4f',
-    description: 'Latest GPT-4o model via A4F'
-  },
-  {
-    id: 'provider-5/o1-mini',
-    name: 'O1 Mini',
-    provider: 'a4f',
-    description: 'Reasoning-focused O1 mini via A4F'
-  },
-  {
-    id: 'provider-6/llama-3.2-1b-instruct',
-    name: 'Llama 3.2 1B',
-    provider: 'a4f',
-    description: 'Fast and lightweight Llama 3.2 1B via A4F'
-  },
+  // {
+  //   id: 'provider-5/gpt-4o-mini',
+  //   name: 'GPT-4o Mini',
+  //   provider: 'a4f',
+  //   description: 'Fast and efficient GPT-4o mini via A4F'
+  // },
+
+  // {
+  //   id: 'provider-5/gpt-4o',
+  //   name: 'GPT-4o',
+  //   provider: 'a4f',
+  //   description: 'Latest GPT-4o model via A4F'
+  // },
+
+  // {
+  //   id: 'provider-5/o1-mini',
+  //   name: 'O1 Mini',
+  //   provider: 'a4f',
+  //   description: 'Reasoning-focused O1 mini via A4F'
+  // },
+
+  // {
+  //   id: 'provider-6/llama-3.2-1b-instruct',
+  //   name: 'Llama 3.2 1B',
+  //   provider: 'a4f',
+  //   description: 'Fast and lightweight Llama 3.2 1B via A4F'
+  // },
+
   {
     id: 'provider-5/deepseek-r1-0528-qwen3-8b',
     name: 'DeepSeek R1 Qwen3 8B',
     provider: 'a4f',
     description: 'Advanced reasoning model DeepSeek R1 via A4F'
   },
-  {
-    id: 'provider-1/qwen3-32b',
-    name: 'Qwen3 32B',
-    provider: 'a4f',
-    description: 'Large Qwen3 32B model via A4F'
-  },
+
+  // {
+  //   id: 'provider-1/qwen3-32b',
+  //   name: 'Qwen3 32B',
+  //   provider: 'a4f',
+  //   description: 'Large Qwen3 32B model via A4F'
+  // },
+  
   {
     id: 'provider-5/qwq-32b',
     name: 'QwQ 32B',
