@@ -40,7 +40,7 @@ export async function generateImageToVideo(
     
     const requestBody: ImageToVideoRequest = {
       key: API_CONFIG.MODELSLAB_API_KEY,
-      model_id: 'seedance_i2v',
+      model_id: 'seedance-i2v',
       init_image: imageUrl,
       prompt: prompt,
       ...(negativePrompt && { negative_prompt: negativePrompt })
