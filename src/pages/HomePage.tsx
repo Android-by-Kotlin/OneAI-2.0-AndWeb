@@ -226,14 +226,18 @@ const HomePage = () => {
 
                       {feature.title === 'AI Chat' && (
                         <div className="absolute inset-0">
-                          {/* Showcase Image */}
-                          <img
-                            src="https://yostrato.com/wp-content/uploads/2024/09/yostrato.jpg"
-                            alt="AI Chat Interface Example"
+                          {/* Showcase Video */}
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                             className="absolute inset-0 w-full h-full object-cover"
-                          />
+                          >
+                            <source src="https://www.shutterstock.com/shutterstock/videos/3525274597/preview/stock-footage-cinematic-concept-of-ai-chatbot-interface-generate-answer-prompt-on-productivity-and-fitness.webm" type="video/webm" />
+                          </video>
                           {/* Gradient overlay for depth */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50" />
                         </div>
                       )}
 
