@@ -1,8 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, Loader, Trash2, Settings, Image as ImageIcon, X } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Trash2, Settings, Image as ImageIcon, X, Plus, MessageSquare, Clock } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
+import { 
+  createChatSession, 
+  updateChatSession, 
+  getUserChatSessions, 
+  deleteChatSession,
+  generateChatTitle,
+  type ChatSession 
+} from '../services/chatHistoryService';
+import { useAuth } from '../contexts/AuthContext';
 
 // Typing effect component
 const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: number; onUpdate?: () => void }) => {
@@ -28,6 +37,7 @@ const TypingText = ({ text, speed = 5, onUpdate }: { text: string; speed?: numbe
 
 const ChatBotPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +46,10 @@ const ChatBotPage = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,6 +65,56 @@ const ChatBotPage = () => {
   // Scroll function that can be called during typing
   const scrollDuringTyping = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Load chat history on mount
+  useEffect(() => {
+    if (user?.uid) {
+      loadChatHistory();
+    }
+  }, [user]);
+
+  const loadChatHistory = async () => {
+    if (!user?.uid) return;
+    
+    setIsLoadingHistory(true);
+    try {
+      const sessions = await getUserChatSessions(user.uid);
+      setChatSessions(sessions);
+    } catch (err) {
+      console.error('Error loading chat history:', err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const startNewChat = async () => {
+    if (!user?.uid) return;
+
+    setMessages([]);
+    setCurrentSessionId(null);
+    setSelectedImage(null);
+    setError(null);
+    setShowHistory(false);
+  };
+
+  const loadChatSession = (session: ChatSession) => {
+    setMessages(session.messages);
+    setCurrentSessionId(session.id);
+    setSelectedModel(session.model);
+    setShowHistory(false);
+  };
+
+  const deleteChat = async (sessionId: string) => {
+    try {
+      await deleteChatSession(sessionId);
+      setChatSessions(prev => prev.filter(s => s.id !== sessionId));
+      if (currentSessionId === sessionId) {
+        startNewChat();
+      }
+    } catch (err) {
+      console.error('Error deleting chat:', err);
+    }
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +136,7 @@ const ChatBotPage = () => {
   };
 
   const handleSend = async () => {
-    if ((!inputText.trim() && !selectedImage) || isLoading) return;
+    if ((!inputText.trim() && !selectedImage) || isLoading || !user?.uid) return;
 
     const userMessage: Message = {
       id: generateMessageId(),
@@ -83,7 +147,8 @@ const ChatBotPage = () => {
       image: selectedImage || undefined
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     const currentImage = selectedImage;
     setInputText('');
     setSelectedImage(null);
@@ -104,8 +169,23 @@ const ChatBotPage = () => {
         model: selectedModel
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const finalMessages = [...updatedMessages, assistantMessage];
+      setMessages(finalMessages);
       setTypingMessageId(assistantMessage.id);
+      
+      // Save to Firebase
+      if (currentSessionId) {
+        // Update existing session
+        await updateChatSession(currentSessionId, finalMessages);
+      } else {
+        // Create new session
+        const title = generateChatTitle(userMessage.content);
+        const newSessionId = await createChatSession(user.uid, title, selectedModel);
+        setCurrentSessionId(newSessionId);
+        await updateChatSession(newSessionId, finalMessages);
+        // Reload history to show new chat
+        loadChatHistory();
+      }
       
       // Clear typing effect after animation completes
       setTimeout(() => {
@@ -152,6 +232,20 @@ const ChatBotPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={startNewChat}
+              className="p-2 text-gray-400 hover:text-white transition-colors"
+              title="New chat"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="p-2 text-gray-400 hover:text-white transition-colors"
+              title="Chat history"
+            >
+              <Clock className="w-5 h-5" />
+            </button>
             <button
               onClick={clearChat}
               className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -201,6 +295,66 @@ const ChatBotPage = () => {
                   </button>
                 ))}
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat History Sidebar */}
+      <AnimatePresence>
+        {showHistory && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="glass-dark border-b border-white border-opacity-10 overflow-hidden"
+          >
+            <div className="max-w-5xl mx-auto p-4">
+              <h3 className="text-sm font-semibold text-white mb-3">Chat History</h3>
+              {isLoadingHistory ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader className="w-5 h-5 animate-spin text-primary" />
+                </div>
+              ) : chatSessions.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                  <p>No chat history yet</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {chatSessions.map(session => (
+                    <div
+                      key={session.id}
+                      className={`glass rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer group ${
+                        currentSessionId === session.id ? 'border-2 border-primary' : ''
+                      }`}
+                      onClick={() => loadChatSession(session)}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-white text-sm font-medium truncate">{session.title}</h4>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {session.messages.length} messages • {session.model.split('/').pop()}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(session.updatedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteChat(session.id);
+                          }}
+                          className="p-1 text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                          title="Delete chat"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

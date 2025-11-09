@@ -23,7 +23,7 @@ export const AVAILABLE_MODELS: ChatModel[] = [
     id: 'models/gemini-2.0-flash',
     name: 'Gemini 2.0 Flash',
     provider: 'google',
-    description: '✨ Vision | Fast and efficient model for general tasks'
+    description: ' Vision | Fast and efficient model for general tasks'
   },
   
  
