@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, Loader, Trash2, Settings, Image as ImageIcon, X, Plus, MessageSquare, Clock } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Trash2, Settings, Image as ImageIcon, X, Plus, MessageSquare, Clock, Menu } from 'lucide-react';
 import { sendMessage, generateMessageId, AVAILABLE_MODELS, type Message } from '../services/chatService';
 import { 
   createChatSession, 
@@ -50,7 +50,7 @@ const ChatBotPage = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -407,6 +407,14 @@ const ChatBotPage = () => {
       <div className="glass-dark border-b border-white border-opacity-10 px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
+            {/* Sidebar Toggle Button */}
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="p-2 text-gray-400 hover:text-white transition-colors"
+              title="Toggle sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <button
               onClick={() => navigate('/home')}
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
@@ -428,25 +436,11 @@ const ChatBotPage = () => {
               <Plus className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
-              title="Chat history"
-            >
-              <Clock className="w-5 h-5" />
-            </button>
-            <button
               onClick={clearChat}
               className="p-2 text-gray-400 hover:text-white transition-colors"
               title="Clear chat"
             >
               <Trash2 className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
-              title="Settings"
-            >
-              <Settings className="w-5 h-5" />
             </button>
           </div>
         </div>
