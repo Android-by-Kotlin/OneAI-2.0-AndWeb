@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import {
   Image,
   MessageSquare,
@@ -25,6 +26,8 @@ interface FeatureCard {
 const HomePage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { scrollYProgress } = useScroll();
+  const [currentSection, setCurrentSection] = useState(0);
 
   const features: FeatureCard[] = [
     {
@@ -71,6 +74,32 @@ const HomePage = () => {
     },
   ];
 
+  // Detect current section based on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const section = Math.floor(scrollPosition / (windowHeight * 0.8));
+      setCurrentSection(Math.min(section, 6)); // 0-6 for hero + 6 features
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Gradient colors for each section
+  const ambientColors = [
+    { from: 'rgba(139, 92, 246, 0.15)', to: 'rgba(59, 130, 246, 0.15)' }, // Hero - purple to blue
+    { from: 'rgba(59, 130, 246, 0.15)', to: 'rgba(6, 182, 212, 0.15)' },   // Image Gen - blue to cyan
+    { from: 'rgba(168, 85, 247, 0.15)', to: 'rgba(236, 72, 153, 0.15)' },  // Image Transform - purple to pink
+    { from: 'rgba(34, 197, 94, 0.15)', to: 'rgba(16, 185, 129, 0.15)' },   // AI Chat - green to emerald
+    { from: 'rgba(20, 184, 166, 0.15)', to: 'rgba(6, 182, 212, 0.15)' },   // Video Gen - teal to cyan
+    { from: 'rgba(99, 102, 241, 0.15)', to: 'rgba(168, 85, 247, 0.15)' },  // Inpainting - indigo to purple
+    { from: 'rgba(236, 72, 153, 0.15)', to: 'rgba(244, 63, 94, 0.15)' },   // Live Avatar - pink to rose
+  ];
+
+  const currentGradient = ambientColors[currentSection];
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -81,7 +110,55 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      {/* Ambient Light Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Top Left Ambient Light */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 20% 20%, ${currentGradient.from} 0%, transparent 50%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+          className="absolute -top-40 -left-40 w-96 h-96 blur-3xl"
+        />
+        
+        {/* Top Right Ambient Light */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 80% 20%, ${currentGradient.to} 0%, transparent 50%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.2 }}
+          className="absolute -top-40 -right-40 w-96 h-96 blur-3xl"
+        />
+        
+        {/* Center Ambient Light */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 50% 50%, ${currentGradient.from} 0%, transparent 60%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.1 }}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] blur-3xl opacity-40"
+        />
+        
+        {/* Bottom Left Ambient Light */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 20% 80%, ${currentGradient.to} 0%, transparent 50%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.3 }}
+          className="absolute -bottom-40 -left-40 w-96 h-96 blur-3xl"
+        />
+        
+        {/* Bottom Right Ambient Light */}
+        <motion.div
+          animate={{
+            background: `radial-gradient(circle at 80% 80%, ${currentGradient.from} 0%, transparent 50%)`,
+          }}
+          transition={{ duration: 1, ease: "easeInOut", delay: 0.15 }}
+          className="absolute -bottom-40 -right-40 w-96 h-96 blur-3xl"
+        />
+      </div>
+
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5">
