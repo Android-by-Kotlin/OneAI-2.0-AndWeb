@@ -212,20 +212,15 @@ const HomePage = () => {
                       )}
 
                       {feature.title === 'Image Transform' && (
-                        <div className="absolute inset-0 flex items-center justify-center p-8">
-                          {/* Before/After effect */}
-                          <div className="relative w-full h-full">
-                            <motion.div
-                              animate={{ x: [-20, 20, -20] }}
-                              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                              className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-30 blur-xl`}
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-2xl`}>
-                                {feature.icon}
-                              </div>
-                            </div>
-                          </div>
+                        <div className="absolute inset-0">
+                          {/* Showcase Image */}
+                          <img
+                            src="https://blogs-cdn.imagine.art/runaway_refrence_5_4_3e57bb7ea0.webp"
+                            alt="AI Image Transform Example"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          {/* Gradient overlay for depth */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                         </div>
                       )}
 
