@@ -12,7 +12,10 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Message } from './chatService';
+import { type Message } from './chatService';
+
+// Re-export Message type for convenience
+export type { Message } from './chatService';
 
 export interface ChatSession {
   id: string;
