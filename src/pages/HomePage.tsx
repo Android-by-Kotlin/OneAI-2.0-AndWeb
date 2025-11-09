@@ -11,7 +11,6 @@ import {
   LogOut,
   Sparkles,
   Mic,
-  Clapperboard,
   Video,
   ArrowRight,
 } from 'lucide-react';
@@ -53,18 +52,11 @@ const HomePage = () => {
       route: '/chatbot',
     },
     {
-      title: 'Text to Video',
-      description: 'Create videos from text prompts using AI video generation models',
+      title: 'Video Generation',
+      description: 'Create videos from text prompts or images with Seedance AI models',
       icon: <Video className="w-8 h-8" />,
       gradient: 'from-orange-500 to-red-500',
       route: '/text-to-video',
-    },
-    {
-      title: 'Image to Video',
-      description: 'Generate videos from images with Seedance AI model',
-      icon: <Clapperboard className="w-8 h-8" />,
-      gradient: 'from-teal-500 to-cyan-500',
-      route: '/image-to-video',
     },
     {
       title: 'Inpainting',
@@ -88,7 +80,7 @@ const HomePage = () => {
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
       const section = Math.floor(scrollPosition / (windowHeight * 0.8));
-      setCurrentSection(Math.min(section, 7)); // 0-7 for hero + 7 features
+      setCurrentSection(Math.min(section, 6)); // 0-6 for hero + 6 features
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -101,8 +93,7 @@ const HomePage = () => {
     { from: 'rgba(59, 130, 246, 0.35)', to: 'rgba(6, 182, 212, 0.25)', accent: 'rgba(37, 99, 235, 0.2)' },   // Image Gen - blue to cyan
     { from: 'rgba(168, 85, 247, 0.35)', to: 'rgba(236, 72, 153, 0.25)', accent: 'rgba(192, 38, 211, 0.2)' }, // Image Transform - purple to pink
     { from: 'rgba(34, 197, 94, 0.35)', to: 'rgba(16, 185, 129, 0.25)', accent: 'rgba(22, 163, 74, 0.2)' },   // AI Chat - green to emerald
-    { from: 'rgba(249, 115, 22, 0.35)', to: 'rgba(239, 68, 68, 0.25)', accent: 'rgba(234, 88, 12, 0.2)' },  // Text to Video - orange to red
-    { from: 'rgba(20, 184, 166, 0.35)', to: 'rgba(6, 182, 212, 0.25)', accent: 'rgba(13, 148, 136, 0.2)' },  // Image to Video - teal to cyan
+    { from: 'rgba(249, 115, 22, 0.35)', to: 'rgba(239, 68, 68, 0.25)', accent: 'rgba(234, 88, 12, 0.2)' },  // Video Generation - orange to red
     { from: 'rgba(99, 102, 241, 0.35)', to: 'rgba(168, 85, 247, 0.25)', accent: 'rgba(124, 58, 237, 0.2)' }, // Inpainting - indigo to purple
     { from: 'rgba(236, 72, 153, 0.35)', to: 'rgba(244, 63, 94, 0.25)', accent: 'rgba(219, 39, 119, 0.2)' },  // Live Avatar - pink to rose
   ];
@@ -311,24 +302,7 @@ const HomePage = () => {
                         </div>
                       )}
 
-                      {feature.title === 'Text to Video' && (
-                        <div className="absolute inset-0">
-                          {/* Showcase Video */}
-                          <video
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="absolute inset-0 w-full h-full object-cover"
-                          >
-                            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4" />
-                          </video>
-                          {/* Gradient overlay for depth */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50" />
-                        </div>
-                      )}
-
-                      {feature.title === 'Image to Video' && (
+                      {feature.title === 'Video Generation' && (
                         <div className="absolute inset-0">
                           {/* Showcase Video */}
                           <video
