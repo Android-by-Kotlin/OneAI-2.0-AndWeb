@@ -200,7 +200,7 @@ const ChatBotPage = () => {
           setChatSessions(prev => 
             prev.map(session => 
               session.id === currentSessionId 
-                ? { ...session, messages: finalMessages, updatedAt: Date.now() }
+                ? { ...session, messages: finalMessages, updatedAt: new Date() }
                 : session
             )
           );
@@ -213,11 +213,12 @@ const ChatBotPage = () => {
           // Add to local state without reloading from Firebase
           setChatSessions(prev => [{
             id: newSessionId,
+            userId: user.uid,
             title,
             model: selectedModel,
             messages: finalMessages,
-            createdAt: Date.now(),
-            updatedAt: Date.now()
+            createdAt: new Date(),
+            updatedAt: new Date()
           }, ...prev]);
         }
       } catch (saveError: any) {

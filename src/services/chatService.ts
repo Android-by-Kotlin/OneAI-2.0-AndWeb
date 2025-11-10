@@ -148,7 +148,7 @@ async function sendToGemini(
         ? imageData.split('base64,')[1] 
         : imageData;
       
-      const imageParts = [
+      const imageParts: any[] = [
         {
           inlineData: {
             data: base64Data,
@@ -158,7 +158,7 @@ async function sendToGemini(
         { text: message }
       ];
       
-      const result = await model.generateContent(imageParts);
+      const result = await model.generateContent(imageParts as any);
       const response = await result.response;
       const text = response.text();
       

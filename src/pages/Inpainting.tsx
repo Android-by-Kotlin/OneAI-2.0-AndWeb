@@ -24,7 +24,7 @@ const SketchToImagePage = () => {
   const [tool, setTool] = useState<'brush' | 'eraser'>('brush');
   
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+  let interval: number;
     if (isLoading) {
       const startTime = Date.now();
       interval = setInterval(() => {

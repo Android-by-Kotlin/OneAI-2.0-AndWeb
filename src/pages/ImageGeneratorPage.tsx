@@ -15,7 +15,7 @@ const ImageGeneratorPage = () => {
   const [generationTime, setGenerationTime] = useState<number | null>(null);
   
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+  let interval: number;
     if (isLoading) {
       const startTime = Date.now();
       interval = setInterval(() => {

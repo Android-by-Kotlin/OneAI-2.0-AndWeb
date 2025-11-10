@@ -21,7 +21,7 @@ const ImageToImagePage = () => {
   const fileInput2Ref = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+  let interval: number;
     if (isLoading) {
       const startTime = Date.now();
       interval = setInterval(() => {

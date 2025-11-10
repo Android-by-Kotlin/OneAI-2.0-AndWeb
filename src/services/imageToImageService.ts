@@ -24,6 +24,7 @@ interface ModelsLabResponse {
   generationTime?: number;
   id?: string;
   output?: string[];
+  proxy_links?: string[];
   meta?: any;
   error?: string;
   message?: string;
