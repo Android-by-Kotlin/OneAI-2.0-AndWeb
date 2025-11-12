@@ -1,14 +1,9 @@
-# OneAI Web Application 🎨✨
+# OneAI Web Application
 
 > A complete web version of the OneAI Android app with all features
 
-[![React](https://img.shields.io/badge/React-18-blue)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7-purple)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-cyan)](https://tailwindcss.com/)
-[![Firebase](https://img.shields.io/badge/Firebase-Auth-orange)](https://firebase.google.com/)
 
-## 📸 Screenshots
+##  Screenshots
 
 <div align="center">
 
@@ -65,32 +60,20 @@
 
 ---
 
-## ✨ Features
+##  Features
 
-- 🎨 **Text to Image Generation** - Generate stunning images from text prompts
-- 🖼️ **Image Transformation** - Transform and enhance images with AI
-- 💬 **AI Chat Assistant** - Chat with advanced AI models (Gemini, Claude)
-- 🎬 **Video Generation** - Create videos from text descriptions  
-- 📹 **Image to Video** - Animate static images
-- ✏️ **Sketch to Image** - Convert sketches to realistic images
-- 🎭 **Live Avatar** - Interactive AI avatar streaming
-- 🔐 **Firebase Authentication** - Email/password + Google Sign-In
+- **Text to Image Generation** - Generate stunning images from text prompts
+- **Image Transformation** - Transform and enhance images with AI
+- **AI Chat Assistant** - Chat with advanced AI models (Gemini, Claude)
+- **Video Generation** - Create videos from text descriptions  
+- **Image to Video** - Animate static images
+- **Sketch to Image** - Convert sketches to realistic images
+- **Live Avatar** - Interactive AI avatar streaming
+- **Firebase Authentication** - Email/password + Google Sign-In
 
-## 🚀 Quick Start
+##  What's Included
 
-```bash
-# Navigate to project
-cd oneai-web
-
-# Run development server
-npm run dev
-
-# Open browser at http://localhost:5173
-```
-
-## 📦 What's Included
-
-✅ **Complete & Working:**
+**Complete & Working:**
 - Modern glassmorphic UI with Tailwind CSS
 - Firebase authentication (email/password + Google)
 - React Router navigation with protected routes
@@ -99,13 +82,10 @@ npm run dev
 - Home dashboard with feature cards
 - Profile page
 
-🚧 **Ready for Implementation:**
-- All 7 feature pages (stubs created)
-- API configuration for all services
-- Detailed implementation guides
 
 
-## 🛠️ Tech Stack
+
+##  Tech Stack
 
 - **React 18** - UI framework
 - **TypeScript** - Type safety
@@ -116,61 +96,29 @@ npm run dev
 - **React Router** - Navigation
 - **Axios** - HTTP client
 
-## 📁 Project Structure
-
-```
-oneai-web/
-├── src/
-│   ├── pages/          # All page components
-│   ├── contexts/       # React contexts (Auth)
-│   ├── config/         # Firebase & API config
-│   ├── App.tsx         # Main app with routing
-│   └── index.css       # Global styles
-├── Documentation files (QUICKSTART.md, etc.)
-└── package.json
-```
-
-## 🎯 Next Steps
-
-1. **Test the app** - Run `npm run dev`
-2. **Add API keys** - Create `.env` file (see IMPLEMENTATION_GUIDE.md)
-3. **Implement features** - Start with ImageGeneratorPage
-4. **Reference Android code** - Use Kotlin code for API logic
-
-## 🎨 UI Highlights
+##  UI Highlights
 
 - **Glassmorphism design** - Modern glass-effect cards
 - **Smooth animations** - Powered by Framer Motion
 - **Responsive layout** - Works on all devices
 - **Dark theme** - Beautiful purple/indigo gradients
 
-## 📝 Build Status
+<div align="center">
 
-✅ **Production Ready**
-- TypeScript: ✅ PASS
-- Build: ✅ PASS
-- All routes working: ✅ PASS
+**Check Out <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/2764.gif" height="30" alt="love" /> More <img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/200w.gif" height="40" />**
 
-## 🔑 Environment Variables
+<br><br>
 
-Create `.env` file:
+<a href="https://www.linkedin.com/in/om-prakash-mandal-a253a12a6/" target="_blank">
+    <img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/372102050_LINKEDIN_ICON_TRANSPARENT_1080.gif" width="150" />
+</a>
 
-```env
-VITE_GEMINI_API_KEY=your_key
-VITE_OPENROUTER_API_KEY=your_key
-VITE_IMAGE_GEN_API_KEY=your_key
-VITE_VIDEO_GEN_API_KEY=your_key
-VITE_MODELSLAB_API_KEY=your_key
-VITE_STABILITY_API_KEY=your_key
-VITE_HEYGEN_API_KEY=your_key
-```
+<a href="https://play.google.com/store/apps/details?id=max.ohm.oneai&hl=en" target="_blank">
+    <img src="https://user-images.githubusercontent.com/74038190/212281763-e6ecd7ef-c4aa-45b6-a97c-f33f6bb592bd.gif" width="100" />
+</a>
 
-## 📄 License
+<a href="https://omport-uw4mfcu7uk.edgeone.app" target="_blank">
+    <img src="https://cdn.dribbble.com/userupload/28117148/file/original-c0db2041822a946b9529b5ae1fdf08e8.gif" width="140" />
+</a>
 
-Same as the OneAI Android application
-
----
-
-**Made with ❤️ for OneAI** - Transform Ideas into Visual Masterpieces
-
-🚀 **Ready to run!** Check [QUICKSTART.md](QUICKSTART.md) to get started.
+</div>
