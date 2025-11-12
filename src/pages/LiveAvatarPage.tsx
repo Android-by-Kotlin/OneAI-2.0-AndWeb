@@ -5,7 +5,6 @@ import { ArrowLeft, Mic, MicOff, Send, Power, Loader2, AlertCircle, Video as Vid
 import StreamingAvatar, { AvatarQuality, StreamingEvents } from '@heygen/streaming-avatar';
 import { getHeyGenAccessToken } from '../services/heygenTokenService';
 import { API_CONFIG } from '../config/api';
-import { initializeAI, getAIResponse, resetConversation } from '../services/aiChatService';
 import { SpeechRecognitionService } from '../services/speechRecognitionService';
 
 interface Message {
@@ -14,6 +13,68 @@ interface Message {
   sender: 'user' | 'avatar';
   timestamp: Date;
 }
+
+// Simple response generator
+const generateSimpleResponse = (userMessage: string): string => {
+  const lowerMessage = userMessage.toLowerCase().trim();
+  
+  // Greetings
+  if (/^(hi|hello|hey|good morning|good afternoon|good evening)/.test(lowerMessage)) {
+    return "Hello! How can I help you today?";
+  }
+  
+  // How are you
+  if (/how are you|how're you/.test(lowerMessage)) {
+    return "I'm doing great, thank you for asking! How about you?";
+  }
+  
+  // Thank you
+  if (/^(thank you|thanks|thank)/.test(lowerMessage)) {
+    return "You're welcome! Happy to help!";
+  }
+  
+  // Goodbye
+  if (/^(bye|goodbye|see you|good night)/.test(lowerMessage)) {
+    return "Goodbye! Have a great day!";
+  }
+  
+  // Help
+  if (/help|assist/.test(lowerMessage)) {
+    return "I'm here to speak whatever you want me to say. Just type your message!";
+  }
+  
+  // What questions
+  if (/^what (is|are)/.test(lowerMessage)) {
+    return "That's an interesting question! Let me tell you about it.";
+  }
+  
+  // How questions
+  if (/^how (do|can|to)/.test(lowerMessage)) {
+    return "Good question! I can help you understand that better.";
+  }
+  
+  // Can you
+  if (/^can you/.test(lowerMessage)) {
+    return "Yes, I can speak any text you give me!";
+  }
+  
+  // Name questions
+  if (/your name|who are you/.test(lowerMessage)) {
+    return "I'm your live avatar assistant, here to speak for you!";
+  }
+  
+  // Default responses
+  const defaultResponses = [
+    "I understand. Tell me more!",
+    "That's interesting! Go on.",
+    "Got it! What else would you like to know?",
+    "I see. Is there anything specific you'd like me to speak about?",
+    "Understood! I'm here to help.",
+    "Noted! What else can I do for you?",
+  ];
+  
+  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+};
 
 const LiveAvatarPage = () => {
   const navigate = useNavigate();
@@ -41,14 +102,8 @@ const LiveAvatarPage = () => {
     setHasApiKey(!!API_CONFIG.HEYGEN_API_KEY);
   }, []);
 
-  // Initialize AI and Speech Recognition on component mount
+  // Initialize Speech Recognition on component mount
   useEffect(() => {
-    try {
-      initializeAI();
-    } catch (err) {
-      console.error('Failed to initialize AI:', err);
-    }
-
     // Initialize speech recognition
     const speechService = new SpeechRecognitionService();
     speechRecognitionRef.current = speechService;
@@ -112,13 +167,7 @@ const LiveAvatarPage = () => {
           setStream(mediaStream);
         }
 
-        // Send welcome message
-        setMessages([{
-          id: Date.now().toString(),
-          text: 'Hello! I\'m your AI avatar. How can I help you today?',
-          sender: 'avatar',
-          timestamp: new Date()
-        }]);
+        // Don't add any welcome message
       });
 
       // Start avatar session
@@ -158,9 +207,6 @@ const LiveAvatarPage = () => {
     setMessages([]);
     setStream(null);
     setIsAvatarSpeaking(false);
-    
-    // Reset AI conversation
-    resetConversation();
   };
 
   // Send message to avatar (can be called from text or voice input)
@@ -181,36 +227,24 @@ const LiveAvatarPage = () => {
     // Don't process if already sending (unless it's an interruption)
     if (isSending && !isVoiceInput) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: messageText,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
     setMessage('');
     setIsSending(true);
 
     try {
-      // Get AI response
-      const aiResponse = await getAIResponse(messageText);
-      console.log('AI Response:', aiResponse);
+      // Generate a simple response based on user input
+      const response = generateSimpleResponse(messageText);
       
-      // Make the avatar speak the AI response
-      await avatarRef.current.speak({ text: aiResponse });
+      // Make the avatar speak the response
+      console.log('Making avatar speak:', response);
+      await avatarRef.current.speak({ text: response });
+      console.log('Avatar speaking:', response);
       
-      // Add avatar message showing what it's speaking
-      const avatarMessage: Message = {
-        id: `avatar-${Date.now()}`,
-        text: aiResponse,
-        sender: 'avatar',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, avatarMessage]);
+      // Clear any previous errors
+      setError(null);
     } catch (err: any) {
-      console.error('Error:', err);
-      setError(err.message || 'Failed to send message');
+      console.error('Error in handleSendMessage:', err);
+      const errorMessage = err.message || 'Failed to make avatar speak';
+      setError(errorMessage);
     } finally {
       setIsSending(false);
     }
@@ -296,7 +330,7 @@ const LiveAvatarPage = () => {
   }, [stream]);
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden p-6">
+    <div className="h-screen bg-black relative overflow-hidden flex flex-col p-6" style={{ maxHeight: '100vh' }}>
       {/* Ambient gradient background - pink/rose theme */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* Vignette overlay */}
@@ -363,7 +397,7 @@ const LiveAvatarPage = () => {
         }} />
       </div>
       
-      <div className="h-full flex flex-col relative z-10">
+      <div className="flex-1 flex flex-col relative z-10 min-h-0">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button 
@@ -393,12 +427,12 @@ const LiveAvatarPage = () => {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
-          {/* Video Section */}
+        <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+          {/* Video Section - Full Width */}
           <motion.div 
-            initial={{ opacity: 0, x: -20 }} 
-            animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 lg:col-span-2 flex flex-col"
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="glass rounded-2xl p-6 flex-1 flex flex-col overflow-hidden"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">Avatar Stream</h2>
@@ -490,18 +524,20 @@ const LiveAvatarPage = () => {
               </div>
             </div>
 
-            {/* Video Display */}
-            <div className="flex-1 bg-gray-800/50 rounded-lg overflow-hidden relative" style={{ minHeight: '500px' }}>
+            {/* Video Display - Full Height */}
+            <div className="flex-1 bg-gray-800/50 rounded-lg overflow-hidden relative border-2 border-gray-700/50">
               {/* Always render video element */}
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted={false}
-                className={`w-full h-full object-cover ${
-                  isConnected ? 'block' : 'hidden'
-                }`}
-                style={{ objectPosition: 'center' }}
+                className="w-full h-full object-contain"
+                style={{ 
+                  objectPosition: 'center',
+                  display: isConnected ? 'block' : 'none',
+                  backgroundColor: '#1f2937'
+                }}
               />
               
               {/* Loading/Placeholder states */}
@@ -539,16 +575,16 @@ const LiveAvatarPage = () => {
             </AnimatePresence>
           </motion.div>
 
-          {/* Chat Section */}
+          {/* Input Section - Bottom */}
           <motion.div 
-            initial={{ opacity: 0, x: 20 }} 
-            animate={{ opacity: 1, x: 0 }}
-            className="glass rounded-2xl p-6 flex flex-col"
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="glass rounded-2xl p-4 flex-shrink-0"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Mic className="w-6 h-6 text-primary" />
-                <h2 className="text-xl font-bold text-white">Conversation</h2>
+                <Mic className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium text-white">Speak to Avatar</span>
               </div>
               {/* Status indicators */}
               <div className="flex items-center gap-2">
@@ -566,46 +602,8 @@ const LiveAvatarPage = () => {
                 )}
               </div>
             </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto space-y-3 mb-4" style={{ minHeight: '400px', maxHeight: '500px' }}>
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-                  No messages yet
-                </div>
-              ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] px-4 py-2 rounded-lg ${
-                        msg.sender === 'user'
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-700 text-gray-100'
-                      }`}
-                    >
-                      <p className="text-sm">{msg.text}</p>
-                      <span className="text-xs opacity-70 mt-1 block">
-                        {msg.timestamp.toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Input */}
-            <div className="space-y-2">
-              {/* Status message */}
-              {isListening && (
-                <div className="text-xs text-gray-400 text-center">
-                  🎤 Voice mode active - speak anytime (you can interrupt the avatar)
-                </div>
-              )}
-              
-              <div className="flex gap-2">
+            
+            <div className="flex gap-2">
                 <input
                   type="text"
                   value={message}
@@ -644,7 +642,6 @@ const LiveAvatarPage = () => {
                   <Send className="w-5 h-5" />
                 )}
               </button>
-            </div>
             </div>
           </motion.div>
         </div>
