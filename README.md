@@ -15,8 +15,8 @@
 ### Login & Home
 <table>
   <tr>
-    <td><img src="YOUR_LOGIN_SCREENSHOT_LINK_HERE" width="400" alt="Login Page"></td>
-    <td><img src="YOUR_HOME_SCREENSHOT_LINK_HERE" width="400" alt="Home Dashboard"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Login+Page" width="400" alt="Login Page"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Home+Dashboard" width="400" alt="Home Dashboard"></td>
   </tr>
   <tr>
     <td align="center"><b>Login Page</b><br><sub>Firebase Authentication</sub></td>
@@ -27,16 +27,16 @@
 ### Features
 <table>
   <tr>
-    <td><img src="YOUR_IMAGE_GEN_SCREENSHOT_LINK_HERE" width="400" alt="Image Generation"></td>
-    <td><img src="YOUR_CHAT_SCREENSHOT_LINK_HERE" width="400" alt="AI Chat"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Image+Generation" width="400" alt="Image Generation"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=AI+Chat" width="400" alt="AI Chat"></td>
   </tr>
   <tr>
     <td align="center"><b>Text-to-Image</b><br><sub>AI Image Generation</sub></td>
     <td align="center"><b>AI Chat</b><br><sub>Chat with AI Models</sub></td>
   </tr>
   <tr>
-    <td><img src="YOUR_LIVE_AVATAR_SCREENSHOT_LINK_HERE" width="400" alt="Live Avatar"></td>
-    <td><img src="YOUR_VIDEO_GEN_SCREENSHOT_LINK_HERE" width="400" alt="Video Generation"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Live+Avatar" width="400" alt="Live Avatar"></td>
+    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Video+Generation" width="400" alt="Video Generation"></td>
   </tr>
   <tr>
     <td align="center"><b>Live Avatar</b><br><sub>Interactive AI Avatar</sub></td>
