@@ -12,6 +12,10 @@
 
 <div align="center">
 
+### Main Application
+<img src="https://via.placeholder.com/1200x600/6366f1/ffffff?text=OneAI+Web+Application" width="100%" alt="OneAI Web App Screenshot">
+<p><i>Replace this with your actual application screenshot</i></p>
+
 ### Login & Home
 <table>
   <tr>
