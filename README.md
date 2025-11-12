@@ -165,11 +165,19 @@ If you love OneAI, please:
 ---
 
 <div align="center">
-  
-  **OneAI** - One New Era of AI
-  
-  Made with ❤️ by the OneAI
-  
-  [Download Now on Google Play](https://play.google.com/store/apps/details?id=max.ohm.oneai)
-  
-</div>
+
+**Check Out <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/2764.gif" height="30" alt="love" /> More <img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/200w.gif" height="40" />**
+
+<br><br>
+
+<a href="https://www.linkedin.com/in/om-prakash-mandal-a253a12a6/" target="_blank">
+    <img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/372102050_LINKEDIN_ICON_TRANSPARENT_1080.gif" width="150" />
+</a>
+
+<a href="https://play.google.com/store/apps/details?id=max.ohm.oneai&hl=en" target="_blank">
+    <img src="https://user-images.githubusercontent.com/74038190/212281763-e6ecd7ef-c4aa-45b6-a97c-f33f6bb592bd.gif" width="100" />
+</a>
+
+<a href="https://omport-uw4mfcu7uk.edgeone.app" target="_blank">
+    <img src="https://cdn.dribbble.com/userupload/28117148/file/original-c0db2041822a946b9529b5ae1fdf08e8.gif" width="140" />
+</a>
