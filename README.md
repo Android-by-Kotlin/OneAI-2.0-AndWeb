@@ -1,4 +1,4 @@
-# OneAI 🎨✨
+# OneAI
 
 <div align="center">
   
