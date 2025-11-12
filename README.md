@@ -13,14 +13,14 @@
 <div align="center">
 
 ### Main Application
-<img src="https://via.placeholder.com/1200x600/6366f1/ffffff?text=OneAI+Web+Application" width="100%" alt="OneAI Web App Screenshot">
+<img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/home.png" width="100%" alt="OneAI Web">
 <p><i>Replace this with your actual application screenshot</i></p>
 
-### Login & Home
+### Login
 <table>
   <tr>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Login+Page" width="400" alt="Login Page"></td>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Home+Dashboard" width="400" alt="Home Dashboard"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/LoginWeb.png" width="400" alt="Login Page"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/profileWeb.png" width="400" alt="Profile"></td>
   </tr>
   <tr>
     <td align="center"><b>Login Page</b><br><sub>Firebase Authentication</sub></td>
@@ -31,21 +31,34 @@
 ### Features
 <table>
   <tr>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Image+Generation" width="400" alt="Image Generation"></td>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=AI+Chat" width="400" alt="AI Chat"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/image.png" width="400" alt="Image Generation"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/transform.png" width="400" alt="Transform"></td>
   </tr>
   <tr>
     <td align="center"><b>Text-to-Image</b><br><sub>AI Image Generation</sub></td>
-    <td align="center"><b>AI Chat</b><br><sub>Chat with AI Models</sub></td>
+    <td align="center"><b>Two Image</b><br><sub>Image Transfrom</sub></td>
   </tr>
   <tr>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Live+Avatar" width="400" alt="Live Avatar"></td>
-    <td><img src="https://via.placeholder.com/400x600/6366f1/ffffff?text=Video+Generation" width="400" alt="Video Generation"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/avatar.png" width="400" alt="Live Avatar"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/chat.png" width="400" alt="AI Chat"></td>
   </tr>
   <tr>
     <td align="center"><b>Live Avatar</b><br><sub>Interactive AI Avatar</sub></td>
-    <td align="center"><b>Video Generation</b><br><sub>Text-to-Video</sub></td>
+    <td align="center"><b>AI Chat</b><br><sub>Various Model</sub></td>
   </tr>
+</table>
+
+
+<table>
+  <tr>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/textTovideoweb.png" width="400" alt="Image Generation"></td>
+    <td><img src="https://github.com/maxohm1/OneAI-ScreenShot/blob/main/videoweb.png" width="400" alt="Image Video"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Text-to-Video</b><br><sub>AI VIdeo Generation</sub></td>
+    <td align="center"><b>Image to VIdeo</b><br><sub>Video Transfrom</sub></td>
+  </tr>
+
 </table>
 
 </div>
