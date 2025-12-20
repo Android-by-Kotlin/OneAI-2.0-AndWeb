@@ -117,7 +117,7 @@
     <img src="https://user-images.githubusercontent.com/74038190/212281763-e6ecd7ef-c4aa-45b6-a97c-f33f6bb592bd.gif" width="100" />
 </a>
 
-<a href="https://omport-uw4mfcu7uk.edgeone.app" target="_blank">
+<a href="https://omportfolio-liard.vercel.app/" target="_blank">
     <img src="https://cdn.dribbble.com/userupload/28117148/file/original-c0db2041822a946b9529b5ae1fdf08e8.gif" width="140" />
 </a>
 
