@@ -13,7 +13,7 @@
   
 </div>
 
-## 🎥 Video Showcase
+##  Video Showcase
 
 <div align="center">
   
@@ -29,7 +29,7 @@
 
 ---
 
-## 📱 Screenshots
+##  Screenshots
 
 <div align="center">
 
@@ -81,11 +81,11 @@
 
 ---
 
-## 🌟 Overview
+##  Overview
 
 **OneAI** is a cutting-edge mobile application that brings the power of advanced AI models directly to your fingertips. Whether you're an artist, designer, content creator, or AI enthusiast, OneAI provides you with powerful tools to generate, transform, and enhance images and videos using state-of-the-art AI technology.
 
-## ✨ Features
+##  Features
 
 ###  **Text to Image Generation**
 - Generate stunning images from text prompts
@@ -141,26 +141,26 @@ We regularly update OneAI with:
 - Bug fixes and stability enhancements
 - User-requested features
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome feedback and suggestions! Please:
 - Rate and review us on [Google Play](https://play.google.com/store/apps/details?id=max.ohm.oneai)
 - Report bugs through the app's feedback feature
 - Share your creations on social media with #OneAI
 
-## 📞 Support
+##  Support
 
 Having issues or questions? We're here to help!
 - **Email:** maxohm24@gmail.com
 
 
 
-## ⭐ Show Your Support
+##  Show Your Support
 
 If you love OneAI, please:
-- ⭐ Rate us 5 stars on [Google Play](https://play.google.com/store/apps/details?id=max.ohm.oneai)
-- 📣 Share with friends and colleagues
-- 💬 Leave a positive review
+-  Rate us 5 stars on [Google Play](https://play.google.com/store/apps/details?id=max.ohm.oneai)
+-  Share with friends and colleagues
+-  Leave a positive review
 
 ---
 
